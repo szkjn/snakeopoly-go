@@ -3,6 +3,7 @@ package main
 import (
 	"image/color"
 	"log"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -18,11 +19,13 @@ const (
 	playAreaStartY     = (screenHeight - playAreaHeight) / 2
 	snakeSize          = screenUnit // Assuming snake size is one unit
 	initialSnakeLength = 3
+	snakeSpeed         = 2
 )
 
 var (
-	WHITE = color.RGBA{160, 210, 160, 255}
-	BLACK = color.RGBA{20, 40, 20, 255}
+	LIGHT_WHITE = color.RGBA{50, 100, 50, 50}
+	WHITE       = color.RGBA{160, 210, 160, 255}
+	BLACK       = color.RGBA{20, 40, 20, 255}
 )
 
 type Snake struct {
@@ -30,7 +33,8 @@ type Snake struct {
 }
 
 type Game struct {
-	snake Snake
+	snake        Snake
+	lastMoveTime time.Time // Timestamp of the last movement
 }
 
 func NewSnake() Snake {
@@ -47,7 +51,33 @@ func NewSnake() Snake {
 }
 
 func (g *Game) Update() error {
-	// Game update logic will go here
+	// Get the current time
+	currentTime := time.Now()
+
+	// Calculate the time elapsed since the last movement
+	elapsedTime := currentTime.Sub(g.lastMoveTime)
+
+	// Calculate the desired time interval for movement based on snakeSpeed
+	desiredInterval := time.Second / time.Duration(snakeSpeed)
+
+	// Check if it's time to move the snake
+	if elapsedTime >= desiredInterval {
+		// Move the snake to the right
+		newHeadX := g.snake.Body[0][0] + 1 // Move one unit to the right
+		newHeadY := g.snake.Body[0][1]
+
+		// Add the new head to the snake's body
+		g.snake.Body = append([][2]int{{newHeadX, newHeadY}}, g.snake.Body...)
+
+		// Remove the tail of the snake to maintain its length
+		if len(g.snake.Body) > initialSnakeLength {
+			g.snake.Body = g.snake.Body[:initialSnakeLength]
+		}
+
+		// Update the last movement time to the current time
+		g.lastMoveTime = currentTime
+	}
+
 	return nil
 }
 
@@ -56,9 +86,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(BLACK)
 
 	// Draw the border of the play area
-	vector.StrokeRect(screen, float32(playAreaStartX), float32(playAreaStartY), float32(playAreaWidth), float32(playAreaHeight), float32(2), WHITE, false)
+	vector.StrokeRect(screen, float32(playAreaStartX), float32(playAreaStartY), float32(playAreaWidth), float32(playAreaHeight), float32(4), WHITE, false)
 
-	// drawGrid(screen)
+	drawGrid(screen)
 
 	// Draw the snake
 	for _, segment := range g.snake.Body {
@@ -72,17 +102,15 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func drawGrid(screen *ebiten.Image) {
-	// Set the color for the grid lines
-	gridColor := color.RGBA{255, 255, 255, 255} // White color
 
 	// Vertical lines
 	for x := 0; x < screenWidth; x += screenUnit {
-		vector.StrokeLine(screen, float32(x), float32(0), float32(x), float32(screenHeight), float32(1), gridColor, false)
+		vector.StrokeLine(screen, float32(x), float32(0), float32(x), float32(screenHeight), float32(1), LIGHT_WHITE, false)
 	}
 
 	// Horizontal lines
 	for y := 0; y < screenHeight; y += screenUnit {
-		vector.StrokeLine(screen, 0, float32(y), float32(screenWidth), float32(y), float32(1), gridColor, false)
+		vector.StrokeLine(screen, 0, float32(y), float32(screenWidth), float32(y), float32(1), LIGHT_WHITE, false)
 	}
 }
 
