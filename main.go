@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
@@ -35,6 +36,45 @@ type Snake struct {
 type Game struct {
 	snake        Snake
 	lastMoveTime time.Time // Timestamp of the last movement
+	currentDir   direction // Current direction of the snake
+	nextDir      direction // Next direction to change to
+}
+
+type direction int
+
+const (
+	dirUp direction = iota
+	dirDown
+	dirLeft
+	dirRight
+)
+
+func (d direction) isOpposite(other direction) bool {
+	switch d {
+	case dirUp:
+		return other == dirDown
+	case dirDown:
+		return other == dirUp
+	case dirLeft:
+		return other == dirRight
+	case dirRight:
+		return other == dirLeft
+	}
+	return false
+}
+
+func (d direction) vector() (int, int) {
+	switch d {
+	case dirUp:
+		return 0, -1
+	case dirDown:
+		return 0, 1
+	case dirLeft:
+		return -1, 0
+	case dirRight:
+		return 1, 0
+	}
+	return 0, 0
 }
 
 func NewSnake() Snake {
@@ -51,6 +91,9 @@ func NewSnake() Snake {
 }
 
 func (g *Game) Update() error {
+	// Handle user input for changing direction
+	g.handleInput()
+
 	// Get the current time
 	currentTime := time.Now()
 
@@ -62,9 +105,10 @@ func (g *Game) Update() error {
 
 	// Check if it's time to move the snake
 	if elapsedTime >= desiredInterval {
-		// Move the snake to the right
-		newHeadX := g.snake.Body[0][0] + 1 // Move one unit to the right
-		newHeadY := g.snake.Body[0][1]
+		// Move the snake according to the current direction
+		moveX, moveY := g.currentDir.vector()
+		newHeadX := g.snake.Body[0][0] + moveX
+		newHeadY := g.snake.Body[0][1] + moveY
 
 		// Add the new head to the snake's body
 		g.snake.Body = append([][2]int{{newHeadX, newHeadY}}, g.snake.Body...)
@@ -79,6 +123,27 @@ func (g *Game) Update() error {
 	}
 
 	return nil
+}
+
+func (g *Game) handleInput() {
+	// Handle arrow key input to change direction
+	if inpututil.IsKeyJustPressed(ebiten.KeyUp) && g.currentDir != dirDown {
+		g.nextDir = dirUp
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyDown) && g.currentDir != dirUp {
+		g.nextDir = dirDown
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) && g.currentDir != dirRight {
+		g.nextDir = dirLeft
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyRight) && g.currentDir != dirLeft {
+		g.nextDir = dirRight
+	}
+
+	// Apply the next direction if it's not opposite to the current direction
+	if g.currentDir != g.nextDir && !g.currentDir.isOpposite(g.nextDir) {
+		g.currentDir = g.nextDir
+	}
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
