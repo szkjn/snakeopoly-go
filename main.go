@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const (
@@ -17,7 +17,6 @@ const (
 	playAreaStartX     = (screenWidth - playAreaWidth) / 2
 	playAreaStartY     = (screenHeight - playAreaHeight) / 2
 	snakeSize          = screenUnit // Assuming snake size is one unit
-	borderThickness    = 2
 	initialSnakeLength = 3
 )
 
@@ -57,21 +56,34 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(BLACK)
 
 	// Draw the border of the play area
-	// Note: The play area's border is drawn as four lines (top, bottom, left, right)
-	ebitenutil.DrawLine(screen, float64(playAreaStartX), float64(playAreaStartY), float64(playAreaStartX+playAreaWidth), float64(playAreaStartY), WHITE)
-	ebitenutil.DrawLine(screen, float64(playAreaStartX), float64(playAreaStartY+playAreaHeight), float64(playAreaStartX+playAreaWidth), float64(playAreaStartY+playAreaHeight), WHITE)
-	ebitenutil.DrawLine(screen, float64(playAreaStartX), float64(playAreaStartY), float64(playAreaStartX), float64(playAreaStartY+playAreaHeight), WHITE)
-	ebitenutil.DrawLine(screen, float64(playAreaStartX+playAreaWidth), float64(playAreaStartY), float64(playAreaStartX+playAreaWidth), float64(playAreaStartY+playAreaHeight), WHITE)
+	vector.StrokeRect(screen, float32(playAreaStartX), float32(playAreaStartY), float32(playAreaWidth), float32(playAreaHeight), float32(2), WHITE, false)
+
+	// drawGrid(screen)
 
 	// Draw the snake
 	for _, segment := range g.snake.Body {
 		segmentX, segmentY := segment[0]*screenUnit, segment[1]*screenUnit
-		ebitenutil.DrawRect(screen, float64(segmentX), float64(segmentY), float64(snakeSize), float64(snakeSize), WHITE)
+		vector.DrawFilledRect(screen, float32(segmentX), float32(segmentY), float32(snakeSize), float32(snakeSize), WHITE, false)
 	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
+}
+
+func drawGrid(screen *ebiten.Image) {
+	// Set the color for the grid lines
+	gridColor := color.RGBA{255, 255, 255, 255} // White color
+
+	// Vertical lines
+	for x := 0; x < screenWidth; x += screenUnit {
+		vector.StrokeLine(screen, float32(x), float32(0), float32(x), float32(screenHeight), float32(1), gridColor, false)
+	}
+
+	// Horizontal lines
+	for y := 0; y < screenHeight; y += screenUnit {
+		vector.StrokeLine(screen, 0, float32(y), float32(screenWidth), float32(y), float32(1), gridColor, false)
+	}
 }
 
 func main() {
