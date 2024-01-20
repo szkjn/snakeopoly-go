@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -48,6 +47,5 @@ func NewDataPoint(snake Snake) DataPoint {
 func (d DataPoint) IsColliding(snake Snake) bool {
 	// Check if the snake's head is at the same coordinates as the datapoint
 	headX, headY := snake.Body[0][0], snake.Body[0][1]
-	fmt.Printf("headX: %v, headY: %v, dpX: %v, dpY: %v\n", headX, headY, d.X/ScreenUnit, d.Y/ScreenUnit)
 	return headX >= d.X && headX < d.X+1 && headY >= d.Y && headY < d.Y+1
 }

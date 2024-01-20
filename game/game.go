@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -75,15 +74,6 @@ func (g *Game) Update() error {
 		// Calculate the desired time interval for movement based on SnakeSpeed
 		desiredInterval := time.Second / time.Duration(SnakeSpeed)
 
-		// Check collision with data point
-		if g.DataPoint.IsColliding(g.Snake) {
-			// Snake has collided with the data point, create a new one
-			fmt.Println(">> COLLISION DETECTION")
-			g.DataPoint = NewDataPoint(g.Snake)
-			// Increment the score or perform other actions as needed
-			g.Score++
-		}
-
 		// Check if it's time to move the snake
 		if elapsedTime >= desiredInterval {
 			// Move the snake according to the current direction
@@ -100,12 +90,22 @@ func (g *Game) Update() error {
 			if nextHeadX1 < PlayAreaX1/ScreenUnit || nextHeadX1 >= PlayAreaX2/ScreenUnit || nextHeadY1 < PlayAreaY1/ScreenUnit || nextHeadY1 >= PlayAreaY2/ScreenUnit {
 				g.State = GameOverState
 			} else {
-				// Add the new head to the snake's body
-				g.Snake.Body = append([][2]float32{{nextHeadX1, nextHeadY1}}, g.Snake.Body...)
 
-				// Remove the tail of the snake to maintain its length
-				if len(g.Snake.Body) > int(InitialSnakeLength) {
-					g.Snake.Body = g.Snake.Body[:int(InitialSnakeLength)]
+				// Check collision with the data point
+				if g.DataPoint.IsColliding(g.Snake) {
+					g.Score++
+
+					g.Snake.Body = append([][2]float32{{nextHeadX1, nextHeadY1}}, g.Snake.Body...)
+
+					// Create a new data point
+					g.DataPoint = NewDataPoint(g.Snake)
+				} else {
+					g.Snake.Body = append([][2]float32{{nextHeadX1, nextHeadY1}}, g.Snake.Body...)
+
+					// Remove the last tail segment to maintain its length
+					if len(g.Snake.Body) > int(InitialSnakeLength) {
+						g.Snake.Body = g.Snake.Body[:len(g.Snake.Body)-1]
+					}
 				}
 
 				// Update the last movement time to the current time
