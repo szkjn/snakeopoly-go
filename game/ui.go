@@ -64,9 +64,12 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image) {
 }
 
 // Draws the Play Page
-func (ui *UI) DrawPlayPage(screen *ebiten.Image, snakeBody [][2]float32) {
+func (ui *UI) DrawPlayPage(screen *ebiten.Image, snakeBody [][2]float32, dp DataPoint) {
 	ui.DrawGrid(screen)
 	ui.DrawPlayArea(screen)
+
+	// Draw the data point
+	vector.DrawFilledRect(screen, dp.X*ScreenUnit, dp.Y*ScreenUnit, float32(SnakeSize), float32(SnakeSize), White, false)
 
 	// Draw the snake
 	for _, segment := range snakeBody {
@@ -78,12 +81,6 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, snakeBody [][2]float32) {
 // Draws the Game Over Page
 func (ui *UI) DrawGameOverPage(screen *ebiten.Image) {
 	text.Draw(screen, "GAME OVER", FontL, int(ScreenWidth/2-100), 50, White)
-}
-
-// HandleInput handles user input related to UI elements
-func (ui *UI) HandleInput() {
-	// You can add code here to handle UI input
-	// For example, checking for button clicks or keyboard input
 }
 
 // SetScore sets the current score to be displayed in the UI

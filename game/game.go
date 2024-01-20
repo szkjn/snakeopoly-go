@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -13,6 +14,7 @@ type Game struct {
 	LastMoveTime time.Time // Timestamp of the last movement
 	CurrentDir   Direction // Current direction of the snake
 	NextDir      Direction // Next direction to change to*
+	DataPoint    DataPoint
 	UI           *UI
 	State        GameState
 	Score        int
@@ -27,11 +29,14 @@ const (
 )
 
 func NewGame() *Game {
+	snake := NewSnake()
+	dataPoint := NewDataPoint(snake)
 	game := &Game{
-		Snake:        NewSnake(),   // Initialize the snake
+		Snake:        snake,        // Initialize the snake
 		LastMoveTime: time.Now(),   // Initialize lastMoveTime
 		CurrentDir:   DirRight,     // Initialize the direction (e.g., DirRight for right)
 		NextDir:      DirRight,     // Initialize the next direction
+		DataPoint:    dataPoint,    // Initialize the first data point
 		UI:           NewUI(),      // Initialize the UI
 		State:        WelcomeState, // Set initial State to WelcomeState
 		Score:        0,
@@ -48,7 +53,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.UI.DrawWelcomePage(screen)
 
 	case PlayState:
-		g.UI.DrawPlayPage(screen, g.Snake.Body)
+		g.UI.DrawPlayPage(screen, g.Snake.Body, g.DataPoint)
 
 	case GameOverState:
 		g.UI.DrawGameOverPage(screen)
@@ -70,6 +75,15 @@ func (g *Game) Update() error {
 		// Calculate the desired time interval for movement based on SnakeSpeed
 		desiredInterval := time.Second / time.Duration(SnakeSpeed)
 
+		// Check collision with data point
+		if g.DataPoint.IsColliding(g.Snake) {
+			// Snake has collided with the data point, create a new one
+			fmt.Println(">> COLLISION DETECTION")
+			g.DataPoint = NewDataPoint(g.Snake)
+			// Increment the score or perform other actions as needed
+			g.Score++
+		}
+
 		// Check if it's time to move the snake
 		if elapsedTime >= desiredInterval {
 			// Move the snake according to the current direction
@@ -81,22 +95,6 @@ func (g *Game) Update() error {
 			// Calculate the new head position before moving
 			nextHeadX1 := headX + float32(moveX)
 			nextHeadY1 := headY + float32(moveY)
-
-			// DEBUGGING
-
-			// fmt.Printf("\nnextHeadX1: %v, nextHeadY1: %v\n", nextHeadX1, nextHeadY1)
-			// fmt.Printf("PlayAreaX1: %v, PlayAreaY1: %v\n", PlayAreaX1/ScreenUnit, PlayAreaY1/ScreenUnit)
-			// fmt.Printf("PlayAreaX2: %v, PlayAreaY2: %v\n", PlayAreaX2/ScreenUnit, PlayAreaY2/ScreenUnit)
-
-			// if nextHeadX1 < PlayAreaX1/ScreenUnit {
-			// 	fmt.Printf(">>>>>>>> nextHeadX1 < PlayAreaX1/ScreenUnit")
-			// } else if nextHeadX1 >= PlayAreaX2/ScreenUnit {
-			// 	fmt.Printf(">>>>>>>> nextHeadX1 >= PlayAreaX/ScreenUnit2")
-			// } else if nextHeadY1 < PlayAreaY1/ScreenUnit {
-			// 	fmt.Printf(">>>>>>>> nextHeadY1 < PlayAreaY1/ScreenUnit")
-			// } else if nextHeadY1 >= PlayAreaY2/ScreenUnit {
-			// 	fmt.Printf(">>>>>>>> nextHeadY1 >= PlayAreaY2/ScreenUnit")
-			// }
 
 			// Check collision with play area border after moving
 			if nextHeadX1 < PlayAreaX1/ScreenUnit || nextHeadX1 >= PlayAreaX2/ScreenUnit || nextHeadY1 < PlayAreaY1/ScreenUnit || nextHeadY1 >= PlayAreaY2/ScreenUnit {

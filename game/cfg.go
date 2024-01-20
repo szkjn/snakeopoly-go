@@ -40,7 +40,9 @@ var (
 
 // Font
 var (
-	FontXL = assets.MustLoadFont(int(ScreenUnit * 1.6))
-	FontL  = assets.MustLoadFont(int(ScreenUnit * 1.3))
-	FontM  = assets.MustLoadFont(int(ScreenUnit * 1))
+	FontXXL = assets.MustLoadFont(int(ScreenUnit * 1.9))
+	FontXL  = assets.MustLoadFont(int(ScreenUnit * 1.6))
+	FontL   = assets.MustLoadFont(int(ScreenUnit * 1.3))
+	FontM   = assets.MustLoadFont(int(ScreenUnit * 1))
+	FontS   = assets.MustLoadFont(int(ScreenUnit * 0.7))
 )
