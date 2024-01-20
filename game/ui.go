@@ -12,7 +12,7 @@ import (
 
 // Define a UI struct to manage UI elements
 type UI struct {
-	score    int
+	score    int8
 	gameOver bool
 }
 
@@ -25,16 +25,16 @@ func NewUI() *UI {
 	return ui
 }
 
-// DrawUI draws UI elements on the screen
-func (ui *UI) DrawUI(screen *ebiten.Image) {
-	// Draw the current score on the screen
-	text.Draw(screen, "Score: ", FontL, 10, 10, color.White)
+// // DrawUI draws UI elements on the screen
+// func (ui *UI) DrawUI(screen *ebiten.Image) {
+// 	// Draw the current score on the screen
+// 	text.Draw(screen, "Score: ", FontL, 10, 10, color.White)
 
-	// If the game is over, display a game over message
-	if ui.gameOver {
-		text.Draw(screen, "GAME OVER", FontL, int(ScreenWidth/2-100), NewUI().score/2, color.White)
-	}
-}
+// 	// If the game is over, display a game over message
+// 	if ui.gameOver {
+// 		text.Draw(screen, "GAME OVER", FontL, int(ScreenWidth/2-100), NewUI().score/2, color.White)
+// 	}
+// }
 
 // drawGrid draws the grid lines on the screen
 func (ui *UI) DrawGrid(screen *ebiten.Image) {
@@ -66,29 +66,30 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image) {
 }
 
 // Draws the Play Page
-func (ui *UI) DrawPlayPage(screen *ebiten.Image, snakeBody [][2]float32, dp DataPoint, score int) {
+func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 	ui.DrawGrid(screen)
 	ui.DrawPlayArea(screen)
 
 	// Draw the data point image at the data point coordinates
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(dp.X*ScreenUnit), float64(dp.Y*ScreenUnit))
-	DrawDataPoint(screen, dp)
+	x, y := g.CurrentDataPoint.Position()
+	op.GeoM.Translate(float64(x*ScreenUnit), float64(y*ScreenUnit))
+	DrawDataPoint(screen, g.CurrentDataPoint)
 
 	// // Draw the data point
 	// vector.DrawFilledRect(screen, dp.X*ScreenUnit, dp.Y*ScreenUnit, float32(SnakeSize), float32(SnakeSize), White, false)
 
 	// Draw the snake
-	for _, segment := range snakeBody {
+	for _, segment := range g.Snake.Body {
 		segmentX, segmentY := segment[0]*ScreenUnit, segment[1]*ScreenUnit
 		vector.DrawFilledRect(screen, segmentX, segmentY, SnakeSize, SnakeSize, White, false)
 	}
-	scoreDisplay := fmt.Sprintf("Score: %d", score)
+	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
 	drawAlignedText(screen, "left", scoreDisplay, FontL, int(PlayAreaHeight+ScreenUnit*2), White)
 }
 
 // Draws the Game Over Page
-func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int) {
+func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8) {
 	ui.DrawGrid(screen)
 	ui.DrawPlayArea(screen)
 
@@ -106,7 +107,7 @@ func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int) {
 }
 
 // SetScore sets the current score to be displayed in the UI
-func (ui *UI) SetScore(score int) {
+func (ui *UI) SetScore(score int8) {
 	ui.score = score
 }
 
@@ -119,11 +120,11 @@ type Welcome struct {
 	UI *UI // UI elements for the welcome page
 }
 
-func NewWelcome() *Welcome {
-	return &Welcome{
-		UI: NewUI(),
-	}
-}
+// func NewWelcome() *Welcome {
+// 	return &Welcome{
+// 		UI: NewUI(),
+// 	}
+// }
 
 // Helper functions
 

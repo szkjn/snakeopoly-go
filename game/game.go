@@ -14,11 +14,12 @@ type Game struct {
 	LastMoveTime      time.Time // Timestamp of the last movement
 	CurrentDir        Direction // Current direction of the snake
 	NextDir           Direction // Next direction to change to*
-	DataPoint         DataPoint
+	DataPointCounter  int8
 	SpecialDataPoints []SpecialDataPoint
+	CurrentDataPoint  DataPointInterface
 	UI                *UI
 	State             GameState
-	Score             int
+	Score             int8
 }
 
 type GameState int
@@ -38,14 +39,15 @@ func NewGame() *Game {
 	}
 
 	game := &Game{
-		Snake:             snake,             // Initialize the snake
-		LastMoveTime:      time.Now(),        // Initialize lastMoveTime
-		CurrentDir:        DirRight,          // Initialize the direction (e.g., DirRight for right)
-		NextDir:           DirRight,          // Initialize the next direction
-		DataPoint:         dataPoint,         // Initialize the first data point
+		Snake:             snake,      // Initialize the snake
+		LastMoveTime:      time.Now(), // Initialize lastMoveTime
+		CurrentDir:        DirRight,   // Initialize the direction (e.g., DirRight for right)
+		NextDir:           DirRight,   // Initialize the next direction
+		DataPointCounter:  0,
 		SpecialDataPoints: specialDataPoints, // Initialize the first data point
-		UI:                NewUI(),           // Initialize the UI
-		State:             WelcomeState,      // Set initial State to WelcomeState
+		CurrentDataPoint:  dataPoint,
+		UI:                NewUI(),      // Initialize the UI
+		State:             WelcomeState, // Set initial State to WelcomeState
 		Score:             0,
 	}
 	return game
@@ -60,7 +62,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.UI.DrawWelcomePage(screen)
 
 	case PlayState:
-		g.UI.DrawPlayPage(screen, g.Snake.Body, g.DataPoint, g.Score)
+		g.UI.DrawPlayPage(screen, g)
 
 	case GameOverState:
 		g.UI.DrawGameOverPage(screen, g.Score)
@@ -84,51 +86,50 @@ func (g *Game) Update() error {
 
 		// Check if it's time to move the snake
 		if elapsedTime >= desiredInterval {
-			// Move the snake according to the current direction
+			// Update the direction of the snake
+			g.CurrentDir = g.NextDir
+
+			// Calculate the new head position
 			moveX, moveY := g.CurrentDir.Vector()
-
-			// Get the head coordinates from the snake's body
 			headX, headY := g.Snake.Body[0][0], g.Snake.Body[0][1]
+			nextHeadX := headX + float32(moveX)
+			nextHeadY := headY + float32(moveY)
 
-			// Calculate the new head position before moving
-			nextHeadX1 := headX + float32(moveX)
-			nextHeadY1 := headY + float32(moveY)
-
-			// Check collision with play area border after moving
-			if nextHeadX1 < PlayAreaX1/ScreenUnit || nextHeadX1 >= PlayAreaX2/ScreenUnit || nextHeadY1 < PlayAreaY1/ScreenUnit || nextHeadY1 >= PlayAreaY2/ScreenUnit {
+			// Check collision with play area border
+			if nextHeadX < PlayAreaX1/ScreenUnit || nextHeadX >= PlayAreaX2/ScreenUnit || nextHeadY < PlayAreaY1/ScreenUnit || nextHeadY >= PlayAreaY2/ScreenUnit {
 				g.State = GameOverState
 			} else {
-
-				// Check collision with the data point
-				if g.DataPoint.IsColliding(g.Snake) {
+				// Check collision with the current data point
+				if g.CurrentDataPoint != nil && g.CurrentDataPoint.IsColliding(g.Snake) {
+					// Handle collision
 					g.Score++
+					g.generateDataPoint() // Generate a new data point
 
-					g.Snake.Body = append([][2]float32{{nextHeadX1, nextHeadY1}}, g.Snake.Body...)
-
-					// Create a new data point
-					g.DataPoint = NewDataPoint(g.Snake)
+					// Handle special data point logic
+					if _, isSpecial := g.CurrentDataPoint.(*SpecialDataPoint); isSpecial {
+						// Special data point logic
+					}
 				} else {
-					g.Snake.Body = append([][2]float32{{nextHeadX1, nextHeadY1}}, g.Snake.Body...)
+					// Move the snake
+					newHead := [2]float32{nextHeadX, nextHeadY}
+					g.Snake.Body = append([][2]float32{newHead}, g.Snake.Body...)
 
-					// Remove the last tail segment to maintain its length
+					// Remove the last tail segment to maintain length
 					if len(g.Snake.Body) > int(InitialSnakeLength) {
 						g.Snake.Body = g.Snake.Body[:len(g.Snake.Body)-1]
 					}
 				}
 
-				// Update the last movement time to the current time
+				// Update the last movement time
 				g.LastMoveTime = currentTime
 			}
 		}
-	} else if g.State == WelcomeState {
-		g.handleMacroInput()
-	} else if g.State == GameOverState {
+	} else if g.State == WelcomeState || g.State == GameOverState {
 		g.handleMacroInput()
 	}
 
 	return nil
 }
-
 func (g *Game) ResetGame() {
 	g.Snake = NewSnake()
 	g.LastMoveTime = time.Now()
@@ -186,4 +187,16 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func quitGame() {
 	os.Exit(0)
+}
+
+func (g *Game) generateDataPoint() {
+	if g.DataPointCounter%SpecialDataPointsRate == 0 && len(g.SpecialDataPoints) > 0 {
+		// Use the first special data point
+		g.CurrentDataPoint = NewSpecialDataPoint(g.SpecialDataPoints[0])
+		g.SpecialDataPoints = g.SpecialDataPoints[1:]
+	} else {
+		// Generate a regular data point
+		g.CurrentDataPoint = NewDataPoint(g.Snake)
+	}
+	g.DataPointCounter++
 }
