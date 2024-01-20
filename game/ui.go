@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -55,6 +56,7 @@ func (ui *UI) DrawPlayArea(screen *ebiten.Image) {
 
 // Draws the Welcome Page
 func (ui *UI) DrawWelcomePage(screen *ebiten.Image) {
+	ui.DrawGrid(screen)
 	ui.DrawPlayArea(screen)
 
 	drawCenteredText(screen, "Welcome to the Snakeopoly!", FontL, int(PlayAreaHeight*0.2), White)
@@ -64,7 +66,7 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image) {
 }
 
 // Draws the Play Page
-func (ui *UI) DrawPlayPage(screen *ebiten.Image, snakeBody [][2]float32, dp DataPoint) {
+func (ui *UI) DrawPlayPage(screen *ebiten.Image, snakeBody [][2]float32, dp DataPoint, score int) {
 	ui.DrawGrid(screen)
 	ui.DrawPlayArea(screen)
 
@@ -76,11 +78,24 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, snakeBody [][2]float32, dp Data
 		segmentX, segmentY := segment[0]*ScreenUnit, segment[1]*ScreenUnit
 		vector.DrawFilledRect(screen, segmentX, segmentY, SnakeSize, SnakeSize, White, false)
 	}
+	scoreDisplay := fmt.Sprintf("Score: %d", score)
+	drawAlignedText(screen, "left", scoreDisplay, FontL, int(PlayAreaHeight+ScreenUnit*2), White)
 }
 
 // Draws the Game Over Page
-func (ui *UI) DrawGameOverPage(screen *ebiten.Image) {
-	text.Draw(screen, "GAME OVER", FontL, int(ScreenWidth/2-100), 50, White)
+func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int) {
+	ui.DrawGrid(screen)
+	ui.DrawPlayArea(screen)
+
+	scoreDisplay := fmt.Sprintf("Score: %d", score)
+	levelDisplay := fmt.Sprintf("Level: XXX")
+
+	drawCenteredText(screen, "GAME OVER", FontXL, int(PlayAreaHeight*0.25), White)
+	drawCenteredText(screen, scoreDisplay, FontL, int(PlayAreaHeight*0.4), White)
+	drawCenteredText(screen, levelDisplay, FontL, int(PlayAreaHeight*0.5), White)
+	drawCenteredText(screen, "Oops! You've been out-monopolized.", FontL, int(PlayAreaHeight*0.65), White)
+	drawCenteredText(screen, "But don't worry, your data", FontL, int(PlayAreaHeight*0.75), White)
+	drawCenteredText(screen, "will live on forever with us.", FontL, int(PlayAreaHeight*0.85), White)
 }
 
 // SetScore sets the current score to be displayed in the UI
@@ -105,7 +120,7 @@ func NewWelcome() *Welcome {
 
 // Helper functions
 
-// drawCenteredText draws centered text on the x-axis
+// Draws centered text on the x-axis
 func drawCenteredText(screen *ebiten.Image, txt string, fontFace font.Face, y int, color color.Color) {
 	// Calculate the text width
 	textRect, _ := font.BoundString(fontFace, txt)
@@ -113,5 +128,26 @@ func drawCenteredText(screen *ebiten.Image, txt string, fontFace font.Face, y in
 	x := (int(ScreenWidth) - int(textWidth)) / 2
 
 	// Draw the centered text
+	text.Draw(screen, txt, fontFace, x, y, color)
+}
+
+// Draws text aligned to the specified side (left or right)
+func drawAlignedText(screen *ebiten.Image, side string, txt string, fontFace font.Face, y int, color color.Color) {
+	// Calculate the text width
+	textRect, _ := font.BoundString(fontFace, txt)
+	textWidth := int((textRect.Max.X - textRect.Min.X).Round())
+
+	// Calculate the x position based on the specified side
+	var x int
+	if side == "left" {
+		x = int(ScreenUnit)
+	} else if side == "right" {
+		x = int(ScreenWidth) - textWidth
+	} else {
+		// Default to center if an invalid side is provided
+		x = (int(ScreenWidth) - int(textWidth)) / 2
+	}
+
+	// Draw the aligned text
 	text.Draw(screen, txt, fontFace, x, y, color)
 }

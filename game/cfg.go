@@ -33,7 +33,7 @@ const (
 
 // Colors
 var (
-	LightWhite = color.RGBA{50, 100, 50, 50}
+	LightWhite = color.RGBA{20, 70, 20, 255}
 	White      = color.RGBA{160, 210, 160, 255}
 	Black      = color.RGBA{20, 40, 20, 255}
 )

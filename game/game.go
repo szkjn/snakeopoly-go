@@ -52,10 +52,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.UI.DrawWelcomePage(screen)
 
 	case PlayState:
-		g.UI.DrawPlayPage(screen, g.Snake.Body, g.DataPoint)
+		g.UI.DrawPlayPage(screen, g.Snake.Body, g.DataPoint, g.Score)
 
 	case GameOverState:
-		g.UI.DrawGameOverPage(screen)
+		g.UI.DrawGameOverPage(screen, g.Score)
 
 	}
 }
