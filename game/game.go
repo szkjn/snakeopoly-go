@@ -1,6 +1,7 @@
 package game
 
 import (
+	"os"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -109,6 +110,13 @@ func (g *Game) Update() error {
 				g.LastMoveTime = currentTime
 			}
 		}
+	} else {
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyQ) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
+			quitGame()
+		} else if inpututil.IsKeyJustPressed(ebiten.KeyP) {
+			*g = *NewGame()
+		}
 	}
 
 	return nil
@@ -137,4 +145,8 @@ func (g *Game) handleInput() {
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return int(ScreenWidth), int(ScreenHeight)
+}
+
+func quitGame() {
+	os.Exit(0)
 }
