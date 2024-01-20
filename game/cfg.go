@@ -6,29 +6,26 @@ import (
 	"github.com/szkjn/snakeopoly-go/assets"
 )
 
-// Constants related to screen dimensions
+// Constants related to screen and play area dimensions
 const (
-	ScreenRatio  float32 = 5.0 / 4.0
-	ScreenWidth  float32 = 800.0
-	ScreenHeight float32 = ScreenWidth / ScreenRatio
-	ScreenUnit   float32 = ScreenWidth / 25
-)
-
-// Constants related to the play area
-const (
-	PlayAreaWidth  float32 = ScreenWidth - (ScreenUnit * 2)  // Example: 16 units wide
-	PlayAreaHeight float32 = ScreenHeight - (ScreenUnit * 5) // Example: 12 units tall
+	ScreenRatio    float32 = 5.0 / 4.0
+	ScreenWidth    float32 = 800.0
+	ScreenHeight   float32 = ScreenWidth / ScreenRatio
+	ScreenUnit     float32 = ScreenWidth / 25
+	PlayAreaWidth  float32 = ScreenWidth - (ScreenUnit * 2)
+	PlayAreaHeight float32 = ScreenHeight - (ScreenUnit * 5)
 	PlayAreaX1     float32 = ScreenUnit
 	PlayAreaY1     float32 = ScreenUnit
 	PlayAreaX2     float32 = PlayAreaX1 + PlayAreaWidth
 	PlayAreaY2     float32 = PlayAreaY1 + PlayAreaHeight
 )
 
-// Constants related to the snake
+// Constants related to the snake and data points
 const (
-	SnakeSize          float32 = ScreenUnit // Assuming snake size is one unit
-	InitialSnakeLength float32 = 3.0
-	SnakeSpeed         float32 = 6.0
+	SnakeSize             float32 = ScreenUnit
+	InitialSnakeLength    float32 = 3.0
+	SnakeSpeed            float32 = 6.0
+	SpecialDataPointsRate int8    = 2
 )
 
 // Colors

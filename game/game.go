@@ -1,6 +1,7 @@
 package game
 
 import (
+	"log"
 	"os"
 	"time"
 
@@ -9,14 +10,15 @@ import (
 )
 
 type Game struct {
-	Snake        Snake
-	LastMoveTime time.Time // Timestamp of the last movement
-	CurrentDir   Direction // Current direction of the snake
-	NextDir      Direction // Next direction to change to*
-	DataPoint    DataPoint
-	UI           *UI
-	State        GameState
-	Score        int
+	Snake             Snake
+	LastMoveTime      time.Time // Timestamp of the last movement
+	CurrentDir        Direction // Current direction of the snake
+	NextDir           Direction // Next direction to change to*
+	DataPoint         DataPoint
+	SpecialDataPoints []SpecialDataPoint
+	UI                *UI
+	State             GameState
+	Score             int
 }
 
 type GameState int
@@ -30,15 +32,21 @@ const (
 func NewGame() *Game {
 	snake := NewSnake()
 	dataPoint := NewDataPoint(snake)
+	specialDataPoints, err := LoadSpecialDataPoints()
+	if err != nil {
+		log.Fatalf("Failed to load special data points: %v", err)
+	}
+
 	game := &Game{
-		Snake:        snake,        // Initialize the snake
-		LastMoveTime: time.Now(),   // Initialize lastMoveTime
-		CurrentDir:   DirRight,     // Initialize the direction (e.g., DirRight for right)
-		NextDir:      DirRight,     // Initialize the next direction
-		DataPoint:    dataPoint,    // Initialize the first data point
-		UI:           NewUI(),      // Initialize the UI
-		State:        WelcomeState, // Set initial State to WelcomeState
-		Score:        0,
+		Snake:             snake,             // Initialize the snake
+		LastMoveTime:      time.Now(),        // Initialize lastMoveTime
+		CurrentDir:        DirRight,          // Initialize the direction (e.g., DirRight for right)
+		NextDir:           DirRight,          // Initialize the next direction
+		DataPoint:         dataPoint,         // Initialize the first data point
+		SpecialDataPoints: specialDataPoints, // Initialize the first data point
+		UI:                NewUI(),           // Initialize the UI
+		State:             WelcomeState,      // Set initial State to WelcomeState
+		Score:             0,
 	}
 	return game
 }

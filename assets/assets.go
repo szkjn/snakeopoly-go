@@ -2,10 +2,12 @@ package assets
 
 import (
 	"embed"
+	"encoding/csv"
 	"fmt"
 	"image"
 	_ "image/png"
 	"io/fs"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"golang.org/x/image/font"
@@ -15,9 +17,9 @@ import (
 //go:embed *
 var assets embed.FS
 
-var DataPoint = mustLoadImage("images/30x30/user.png")
+var DataPoint = MustLoadImage("images/30x30/user.png")
 
-func mustLoadImage(path string) *ebiten.Image {
+func MustLoadImage(path string) *ebiten.Image {
 	f, err := assets.Open(path)
 	if err != nil {
 		panic(err)
@@ -41,7 +43,7 @@ func mustLoadImages(path string) []*ebiten.Image {
 
 	images := make([]*ebiten.Image, len(matches))
 	for i, match := range matches {
-		images[i] = mustLoadImage(match)
+		images[i] = MustLoadImage(match)
 	}
 
 	return images
@@ -67,4 +69,20 @@ func MustLoadFont(size float64) font.Face {
 		panic(err)
 	}
 	return face
+}
+
+func LoadSpecialDataPointsCSV() ([][]string, error) {
+	fileData, err := assets.ReadFile("competitors.csv")
+	if err != nil {
+		return nil, err
+	}
+
+	reader := csv.NewReader(strings.NewReader(string(fileData)))
+	reader.Comma = ';'
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	return records, nil
 }

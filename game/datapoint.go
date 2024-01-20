@@ -2,14 +2,25 @@ package game
 
 import (
 	"math/rand"
+	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/szkjn/snakeopoly-go/assets"
 )
 
-// DataPoint represents a single datapoint in the game
+// Represents a normal data point
 type DataPoint struct {
 	X, Y float32 // Coordinates of the datapoint
+}
+
+// Represents a special data point
+type SpecialDataPoint struct {
+	Name  string
+	Slug  string
+	Year  int
+	Text  string
+	Level string
+	Image *ebiten.Image
 }
 
 // DrawDataPoint draws the data point on the screen.
@@ -71,4 +82,27 @@ func (d DataPoint) IsColliding(snake Snake) bool {
 	// Check if the snake's head is at the same coordinates as the datapoint
 	headX, headY := snake.Body[0][0], snake.Body[0][1]
 	return headX >= d.X && headX < d.X+1 && headY >= d.Y && headY < d.Y+1
+}
+
+func LoadSpecialDataPoints() ([]SpecialDataPoint, error) {
+	records, err := assets.LoadSpecialDataPointsCSV()
+	if err != nil {
+		return nil, err
+	}
+
+	var specialDataPoints []SpecialDataPoint
+	for _, record := range records[1:] {
+		year, _ := strconv.Atoi(record[2])
+		specialDataPoint := SpecialDataPoint{
+			Name:  record[0],
+			Slug:  record[1],
+			Year:  year,
+			Text:  record[3],
+			Level: record[4],
+			Image: assets.MustLoadImage("images/30x30/" + record[1] + ".png"),
+		}
+		specialDataPoints = append(specialDataPoints, specialDataPoint)
+	}
+
+	return specialDataPoints, nil
 }
