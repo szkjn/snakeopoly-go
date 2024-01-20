@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -15,30 +16,43 @@ type Game struct {
 	LastMoveTime time.Time // Timestamp of the last movement
 	CurrentDir   Direction // Current direction of the snake
 	NextDir      Direction // Next direction to change to*
-	GameOver     bool
 	UI           *UI
+	State        GameState
+	Score        int
 }
+
+type GameState int
+
+const (
+	WelcomeState GameState = iota
+	PlayState
+	GameOverState
+)
 
 func NewGame() *Game {
 	game := &Game{
-		Snake:        NewSnake(), // Initialize the snake
-		LastMoveTime: time.Now(), // Initialize lastMoveTime
-		CurrentDir:   DirRight,   // Initialize the direction (e.g., DirRight for right)
-		NextDir:      DirRight,   // Initialize the next direction
-		GameOver:     false,      // Set GameOver to false initially
-		UI:           NewUI(),    // Initialize the UI
+		Snake:        NewSnake(),   // Initialize the snake
+		LastMoveTime: time.Now(),   // Initialize lastMoveTime
+		CurrentDir:   DirRight,     // Initialize the direction (e.g., DirRight for right)
+		NextDir:      DirRight,     // Initialize the next direction
+		UI:           NewUI(),      // Initialize the UI
+		State:        WelcomeState, // Set initial State to WelcomeState
+		Score:        0,
 	}
 	return game
 }
+
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Fill the screen with black color
 	screen.Fill(Black)
 
-	if g.GameOver {
-		// Display "GAME OVER" text
-		text.Draw(screen, "GAME OVER", FontMain, int(ScreenWidth/2-100), 50, White)
-
-	} else {
+	switch g.State {
+	case WelcomeState:
+		// Display the welcome message
+		text.Draw(screen, "Welcome to the Snakeopoly!", FontMain, 60, 100, White)
+		text.Draw(screen, "Slither your way", FontMain, 120, 200, White)
+		text.Draw(screen, "to Surveillance Sovereignty!", FontMain, 70, 250, White)
+		text.Draw(screen, "Press P to start or Q to quit", FontMain, 100, 350, White)
+	case PlayState:
 		// Draw the border of the play area
 		vector.StrokeRect(screen, float32(PlayAreaX1), float32(PlayAreaY1), float32(PlayAreaWidth), float32(PlayAreaHeight), float32(4), White, false)
 
@@ -49,11 +63,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			segmentX, segmentY := segment[0]*ScreenUnit, segment[1]*ScreenUnit
 			vector.DrawFilledRect(screen, float32(segmentX), float32(segmentY), float32(SnakeSize), float32(SnakeSize), White, false)
 		}
+	case GameOverState:
+		// Display "GAME OVER" text
+		text.Draw(screen, "GAME OVER", FontMain, int(ScreenWidth/2-100), 50, White)
 	}
 }
 
 func (g *Game) Update() error {
-	if !g.GameOver {
+	if g.State == PlayState {
 		// Handle user input for changing direction
 		g.handleInput()
 
@@ -96,7 +113,7 @@ func (g *Game) Update() error {
 
 			// Check collision with play area border after moving
 			if nextHeadX1 < PlayAreaX1/ScreenUnit || nextHeadX1 >= PlayAreaX2/ScreenUnit || nextHeadY1 < PlayAreaY1/ScreenUnit || nextHeadY1 >= PlayAreaY2/ScreenUnit {
-				g.GameOver = true
+				g.State = GameOverState
 			} else {
 				// Add the new head to the snake's body
 				g.Snake.Body = append([][2]float32{{nextHeadX1, nextHeadY1}}, g.Snake.Body...)
@@ -110,16 +127,45 @@ func (g *Game) Update() error {
 				g.LastMoveTime = currentTime
 			}
 		}
-	} else {
-
-		if inpututil.IsKeyJustPressed(ebiten.KeyQ) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
-			quitGame()
-		} else if inpututil.IsKeyJustPressed(ebiten.KeyP) {
-			*g = *NewGame()
-		}
+	} else if g.State == WelcomeState {
+		g.handleMacroInput()
+	} else if g.State == GameOverState {
+		g.handleMacroInput()
 	}
 
 	return nil
+}
+
+func (g *Game) ResetGame() {
+	g.Snake = NewSnake()
+	g.LastMoveTime = time.Now()
+	g.CurrentDir = DirRight
+	g.NextDir = DirRight
+	g.Score = 0
+	g.State = PlayState
+}
+
+func (g *Game) handleMacroInput() {
+	// Handle general macro key interactions
+	if g.State == WelcomeState || g.State == GameOverState {
+
+		// Get the input characters
+		inputChars := ebiten.AppendInputChars(nil)
+
+		// Detect if a key has been pressed
+		if len(inputChars) == 1 {
+			// If "P" has been pressed
+			if inputChars[0] == 112 {
+				fmt.Println("P is pressed")
+				g.State = PlayState
+				g.ResetGame()
+				// If "Q" has been pressed
+			} else if inputChars[0] == 113 {
+				fmt.Println("Q is pressed")
+				quitGame()
+			}
+		}
+	}
 }
 
 func (g *Game) handleInput() {

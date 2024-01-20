@@ -9,9 +9,9 @@ import (
 // Constants related to screen dimensions
 const (
 	ScreenRatio  float32 = 5.0 / 4.0
-	ScreenWidth  float32 = 400.0
+	ScreenWidth  float32 = 500.0
 	ScreenHeight float32 = ScreenWidth / ScreenRatio
-	ScreenUnit   float32 = ScreenWidth / 20
+	ScreenUnit   float32 = ScreenWidth / 25
 )
 
 // Constants related to the play area
@@ -28,7 +28,7 @@ const (
 const (
 	SnakeSize          float32 = ScreenUnit // Assuming snake size is one unit
 	InitialSnakeLength float32 = 3.0
-	SnakeSpeed         float32 = 3.0
+	SnakeSpeed         float32 = 5.0
 )
 
 // Colors

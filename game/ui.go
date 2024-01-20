@@ -62,3 +62,13 @@ func (ui *UI) SetScore(score int) {
 func (ui *UI) SetGameOver() {
 	ui.gameOver = true
 }
+
+type Welcome struct {
+	UI *UI // UI elements for the welcome page
+}
+
+func NewWelcome() *Welcome {
+	return &Welcome{
+		UI: NewUI(),
+	}
+}
