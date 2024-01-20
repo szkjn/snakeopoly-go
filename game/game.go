@@ -1,14 +1,11 @@
 package game
 
 import (
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/text"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type Game struct {
@@ -46,26 +43,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(Black)
 
 	switch g.State {
+
 	case WelcomeState:
-		// Display the welcome message
-		text.Draw(screen, "Welcome to the Snakeopoly!", FontMain, 60, 100, White)
-		text.Draw(screen, "Slither your way", FontMain, 120, 200, White)
-		text.Draw(screen, "to Surveillance Sovereignty!", FontMain, 70, 250, White)
-		text.Draw(screen, "Press P to start or Q to quit", FontMain, 100, 350, White)
+		g.UI.DrawWelcomePage(screen)
+
 	case PlayState:
-		// Draw the border of the play area
-		vector.StrokeRect(screen, float32(PlayAreaX1), float32(PlayAreaY1), float32(PlayAreaWidth), float32(PlayAreaHeight), float32(4), White, false)
+		g.UI.DrawPlayPage(screen, g.Snake.Body)
 
-		g.UI.DrawGrid(screen)
-
-		// Draw the snake
-		for _, segment := range g.Snake.Body {
-			segmentX, segmentY := segment[0]*ScreenUnit, segment[1]*ScreenUnit
-			vector.DrawFilledRect(screen, float32(segmentX), float32(segmentY), float32(SnakeSize), float32(SnakeSize), White, false)
-		}
 	case GameOverState:
-		// Display "GAME OVER" text
-		text.Draw(screen, "GAME OVER", FontMain, int(ScreenWidth/2-100), 50, White)
+		g.UI.DrawGameOverPage(screen)
+
 	}
 }
 
@@ -156,12 +143,10 @@ func (g *Game) handleMacroInput() {
 		if len(inputChars) == 1 {
 			// If "P" has been pressed
 			if inputChars[0] == 112 {
-				fmt.Println("P is pressed")
 				g.State = PlayState
 				g.ResetGame()
 				// If "Q" has been pressed
 			} else if inputChars[0] == 113 {
-				fmt.Println("Q is pressed")
 				quitGame()
 			}
 		}

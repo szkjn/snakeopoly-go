@@ -44,8 +44,8 @@ func mustLoadImages(path string) []*ebiten.Image {
 	return images
 }
 
-func MustLoadFont(name string) font.Face {
-	f, err := assets.ReadFile(name)
+func MustLoadFont(size int) font.Face {
+	f, err := assets.ReadFile("fonts/VT323/VT323-Regular.ttf")
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +56,7 @@ func MustLoadFont(name string) font.Face {
 	}
 
 	face, err := opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    48,
+		Size:    float64(size),
 		DPI:     72,
 		Hinting: font.HintingVertical,
 	})
