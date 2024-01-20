@@ -9,7 +9,7 @@ import (
 // Constants related to screen dimensions
 const (
 	ScreenRatio  float32 = 5.0 / 4.0
-	ScreenWidth  float32 = 500.0
+	ScreenWidth  float32 = 800.0
 	ScreenHeight float32 = ScreenWidth / ScreenRatio
 	ScreenUnit   float32 = ScreenWidth / 25
 )
@@ -40,9 +40,9 @@ var (
 
 // Font
 var (
-	FontXXL = assets.MustLoadFont(int(ScreenUnit * 1.9))
-	FontXL  = assets.MustLoadFont(int(ScreenUnit * 1.6))
-	FontL   = assets.MustLoadFont(int(ScreenUnit * 1.3))
-	FontM   = assets.MustLoadFont(int(ScreenUnit * 1))
-	FontS   = assets.MustLoadFont(int(ScreenUnit * 0.7))
+	FontXXL = assets.MustLoadFont(float64(ScreenUnit * 1.9))
+	FontXL  = assets.MustLoadFont(float64(ScreenUnit * 1.6))
+	FontL   = assets.MustLoadFont(float64(ScreenUnit * 1.3))
+	FontM   = assets.MustLoadFont(float64(ScreenUnit * 1))
+	FontS   = assets.MustLoadFont(float64(ScreenUnit * 0.7))
 )

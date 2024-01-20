@@ -2,7 +2,9 @@ package assets
 
 import (
 	"embed"
+	"fmt"
 	"image"
+	_ "image/png"
 	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -13,10 +15,10 @@ import (
 //go:embed *
 var assets embed.FS
 
-// var DataPoint = mustLoadImage("data_point.png")
+var DataPoint = mustLoadImage("images/30x30/user.png")
 
-func mustLoadImage(name string) *ebiten.Image {
-	f, err := assets.Open(name)
+func mustLoadImage(path string) *ebiten.Image {
+	f, err := assets.Open(path)
 	if err != nil {
 		panic(err)
 	}
@@ -24,6 +26,7 @@ func mustLoadImage(name string) *ebiten.Image {
 
 	img, _, err := image.Decode(f)
 	if err != nil {
+		fmt.Printf("img: %v, f: %v\n", img, f)
 		panic(err)
 	}
 
@@ -44,7 +47,7 @@ func mustLoadImages(path string) []*ebiten.Image {
 	return images
 }
 
-func MustLoadFont(size int) font.Face {
+func MustLoadFont(size float64) font.Face {
 	f, err := assets.ReadFile("fonts/VT323/VT323-Regular.ttf")
 	if err != nil {
 		panic(err)

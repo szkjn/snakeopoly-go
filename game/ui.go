@@ -70,8 +70,13 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, snakeBody [][2]float32, dp Data
 	ui.DrawGrid(screen)
 	ui.DrawPlayArea(screen)
 
-	// Draw the data point
-	vector.DrawFilledRect(screen, dp.X*ScreenUnit, dp.Y*ScreenUnit, float32(SnakeSize), float32(SnakeSize), White, false)
+	// Draw the data point image at the data point coordinates
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(dp.X*ScreenUnit), float64(dp.Y*ScreenUnit))
+	DrawDataPoint(screen, dp)
+
+	// // Draw the data point
+	// vector.DrawFilledRect(screen, dp.X*ScreenUnit, dp.Y*ScreenUnit, float32(SnakeSize), float32(SnakeSize), White, false)
 
 	// Draw the snake
 	for _, segment := range snakeBody {
@@ -96,6 +101,8 @@ func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int) {
 	drawCenteredText(screen, "Oops! You've been out-monopolized.", FontL, int(PlayAreaHeight*0.65), White)
 	drawCenteredText(screen, "But don't worry, your data", FontL, int(PlayAreaHeight*0.75), White)
 	drawCenteredText(screen, "will live on forever with us.", FontL, int(PlayAreaHeight*0.85), White)
+
+	drawCenteredText(screen, "Press P to replay or Q to quit", FontM, int(ScreenHeight-ScreenUnit*2), White)
 }
 
 // SetScore sets the current score to be displayed in the UI
