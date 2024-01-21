@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -148,16 +149,15 @@ func (g *Game) handleMacroInput() {
 			}
 		}
 	} else if g.State == SpecialState {
-
 		// Get the input characters
 		inputChars := ebiten.AppendInputChars(nil)
 
 		// Detect if a key has been pressed
 		if len(inputChars) == 1 {
 			// If "R" has been pressed
-			if inputChars[0] == 106 {
+			fmt.Println(inputChars)
+			if inputChars[0] == 114 {
 				g.State = PlayState
-				g.ResetGame()
 				// If "Q" has been pressed
 			} else if inputChars[0] == 113 {
 				quitGame()

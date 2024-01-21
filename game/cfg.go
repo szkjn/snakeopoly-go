@@ -24,7 +24,7 @@ const (
 const (
 	SnakeSize             float32 = ScreenUnit
 	InitialSnakeLength    float32 = 3
-	SnakeSpeed            float32 = 8
+	SnakeSpeed            float32 = 7
 	SpecialDataPointsRate int8    = 2
 )
 
