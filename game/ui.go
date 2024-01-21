@@ -81,7 +81,7 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 }
 
 // Draws the Special Page
-func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint) {
+func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, currentCharIndex int) {
 	ui.DrawBaseElements(screen)
 
 	name := specialDP.Name
@@ -93,7 +93,7 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint) 
 	ui.DrawText(screen, "center", name, FontL, PlayAreaHeight*0.35, White)
 
 	ui.DrawImage(screen, image, PlayAreaHeight*0.4, 3, "center")
-	ui.DrawMultiLineText(screen, textStr, ScreenWidth*0.33, PlayAreaHeight*0.7, FontM, White, maxLineWidth)
+	ui.DrawMultiLineText(screen, textStr, ScreenWidth*0.33, PlayAreaHeight*0.7, FontM, White, maxLineWidth, currentCharIndex)
 	ui.DrawText(screen, "center", "Press R to resume or Q to quit", FontM, ScreenHeight-ScreenUnit*2, White)
 }
 
@@ -149,7 +149,7 @@ func (ui *UI) DrawText(screen *ebiten.Image, alignment string, textStr string, f
 	text.Draw(screen, textStr, fontFace, int(x), int(y), color)
 }
 
-func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, y float32, fontFace font.Face, clr color.Color, maxLineWidth int) {
+func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, y float32, fontFace font.Face, clr color.Color, maxLineWidth int, currentCharIndex int) {
 
 	// Split the text into words
 	words := strings.Fields(textStr)
@@ -182,9 +182,18 @@ func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, y float
 	// Add the last line
 	lines = append(lines, currentLine)
 
-	// Draw each line
+	// Draw each line, up to currentCharIndex
+	charsDrawn := 0
 	for i, line := range lines {
-		text.Draw(screen, line, fontFace, int(x), int(y)+i*int(ScreenUnit), clr) // Adjust line spacing as needed
+		if charsDrawn+len(line) > currentCharIndex {
+			line = line[:currentCharIndex-charsDrawn]
+		}
+		lineSpacing := i * int(ScreenUnit)
+		text.Draw(screen, line, fontFace, int(x), int(y)+lineSpacing, clr)
+		charsDrawn += len(line)
+		if charsDrawn >= currentCharIndex {
+			break
+		}
 	}
 }
 

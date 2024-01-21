@@ -26,6 +26,8 @@ type Game struct {
 	Blinking                 bool
 	BlinkTimer               time.Duration
 	SnakeVisible             bool
+	TextAnimationTimer       time.Duration
+	CurrentCharIndex         int
 }
 
 type GameState int
@@ -67,6 +69,7 @@ func NewGame() *Game {
 		Level:                    initialLevel,
 		Blinking:                 false,
 		SnakeVisible:             true,
+		CurrentCharIndex:         0,
 	}
 	return game
 }
@@ -81,7 +84,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.UI.DrawPlayPage(screen, g)
 
 	case SpecialState:
-		g.UI.DrawSpecialPage(screen, g.CurrentSpecialDataPoint)
+		g.UI.DrawSpecialPage(screen, g.CurrentSpecialDataPoint, g.CurrentCharIndex)
 
 	case GameOverState:
 		g.UI.DrawGameOverPage(screen, g.Score)
@@ -126,7 +129,6 @@ func (g *Game) Update() error {
 		}
 
 	} else if g.State == BlinkState {
-
 		if time.Since(g.LastMoveTime) >= BlinkFreq {
 			g.SnakeVisible = !g.SnakeVisible
 			g.BlinkTimer += time.Since(g.LastMoveTime)
@@ -139,7 +141,15 @@ func (g *Game) Update() error {
 			g.SnakeVisible = true
 		}
 
-	} else if g.State == WelcomeState || g.State == SpecialState || g.State == GameOverState || g.State == GoalState {
+	} else if g.State == SpecialState {
+		g.handleMacroInput()
+		g.TextAnimationTimer += time.Since(g.LastMoveTime)
+		if g.TextAnimationTimer >= TextAnimationSpeed {
+			g.TextAnimationTimer -= TextAnimationSpeed
+			g.CurrentCharIndex++
+		}
+
+	} else if g.State == WelcomeState || g.State == GameOverState || g.State == GoalState {
 		g.handleMacroInput()
 	}
 

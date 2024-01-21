@@ -49,4 +49,5 @@ var (
 const (
 	TotalBlinkDuration = 1 * time.Second
 	BlinkFreq          = 200 * time.Millisecond
+	TextAnimationSpeed = 2 * time.Second
 )
