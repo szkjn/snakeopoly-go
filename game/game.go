@@ -59,8 +59,6 @@ func NewGame() *Game {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(Black)
-
 	switch g.State {
 
 	case WelcomeState:

@@ -16,33 +16,24 @@ type UI struct {
 	gameOver bool
 }
 
-// NewUI initializes and returns a new UI instance
+// Initialize and return a new UI instance
 func NewUI() *UI {
-	ui := &UI{
-		score:    0,
-		gameOver: false,
-	}
-	return ui
+	return &UI{score: 0, gameOver: false}
 }
 
-// // DrawUI draws UI elements on the screen
-// func (ui *UI) DrawUI(screen *ebiten.Image) {
-// 	// Draw the current score on the screen
-// 	text.Draw(screen, "Score: ", FontL, 10, 10, color.White)
+// Draw base elements common to all displays
+func (ui *UI) DrawBaseElements(screen *ebiten.Image) {
+	screen.Fill(Black)
+	ui.DrawGrid(screen)
+	ui.DrawPlayArea(screen)
+}
 
-// 	// If the game is over, display a game over message
-// 	if ui.gameOver {
-// 		text.Draw(screen, "GAME OVER", FontL, int(ScreenWidth/2-100), NewUI().score/2, color.White)
-// 	}
-// }
-
-// drawGrid draws the grid lines on the screen
+// Draw grid lines on screen
 func (ui *UI) DrawGrid(screen *ebiten.Image) {
 	// Vertical lines
 	for x := 0; x < int(ScreenWidth); x += int(ScreenUnit) {
 		vector.StrokeLine(screen, float32(x), float32(0), float32(x), float32(ScreenHeight), float32(1), LightWhite, false)
 	}
-
 	// Horizontal lines
 	for y := 0; y < int(ScreenHeight); y += int(ScreenUnit) {
 		vector.StrokeLine(screen, 0, float32(y), float32(ScreenWidth), float32(y), float32(1), LightWhite, false)
@@ -54,21 +45,19 @@ func (ui *UI) DrawPlayArea(screen *ebiten.Image) {
 	vector.StrokeRect(screen, PlayAreaX1, PlayAreaY1, PlayAreaWidth, PlayAreaHeight, 2, White, false)
 }
 
-// Draws the Welcome Page
+// Draw Welcome Page
 func (ui *UI) DrawWelcomePage(screen *ebiten.Image) {
-	ui.DrawGrid(screen)
-	ui.DrawPlayArea(screen)
+	ui.DrawBaseElements(screen)
 
-	drawCenteredText(screen, "Welcome to the Snakeopoly!", FontL, int(PlayAreaHeight*0.2), White)
-	drawCenteredText(screen, "Slither your way", FontL, int(PlayAreaHeight*0.35), White)
-	drawCenteredText(screen, "to Surveillance Sovereignty!", FontL, int(PlayAreaHeight*0.45), White)
-	drawCenteredText(screen, "Press P to play or Q to quit", FontM, int(ScreenHeight-ScreenUnit*2), White)
+	ui.DrawText(screen, "center", "Welcome to the Snakeopoly!", FontL, PlayAreaHeight*0.2, White)
+	ui.DrawText(screen, "center", "Slither your way", FontL, PlayAreaHeight*0.35, White)
+	ui.DrawText(screen, "center", "to Surveillance Sovereignty!", FontL, PlayAreaHeight*0.45, White)
+	ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, ScreenHeight-ScreenUnit*2, White)
 }
 
 // Draws the Play Page
 func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
-	ui.DrawGrid(screen)
-	ui.DrawPlayArea(screen)
+	ui.DrawBaseElements(screen)
 
 	// Draw the data point image at the data point coordinates
 	op := &ebiten.DrawImageOptions{}
@@ -76,54 +65,68 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 	op.GeoM.Translate(float64(x*ScreenUnit), float64(y*ScreenUnit))
 	DrawDataPoint(screen, g.CurrentDataPoint)
 
-	// // Draw the data point
-	// vector.DrawFilledRect(screen, dp.X*ScreenUnit, dp.Y*ScreenUnit, float32(SnakeSize), float32(SnakeSize), White, false)
-
 	// Draw the snake
 	for _, segment := range g.Snake.Body {
 		segmentX, segmentY := segment[0]*ScreenUnit, segment[1]*ScreenUnit
 		vector.DrawFilledRect(screen, segmentX, segmentY, SnakeSize, SnakeSize, White, false)
 	}
 	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
-	drawAlignedText(screen, "left", scoreDisplay, FontS, int(PlayAreaHeight+ScreenUnit*2), White)
+	ui.DrawText(screen, "left", scoreDisplay, FontS, PlayAreaHeight+ScreenUnit*2, White)
 	debug := fmt.Sprintf("CurrentDataPoint: %v", g.CurrentDataPoint)
-	drawAlignedText(screen, "left", debug, FontS, int(PlayAreaHeight+ScreenUnit*3), White)
+	ui.DrawText(screen, "left", debug, FontS, PlayAreaHeight+ScreenUnit*3, White)
 
 }
 
 // Draws the Game Over Page
 func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8) {
-	ui.DrawGrid(screen)
-	ui.DrawPlayArea(screen)
+	ui.DrawBaseElements(screen)
 
 	scoreDisplay := fmt.Sprintf("Score: %d", score)
 	levelDisplay := fmt.Sprintf("Level: XXX")
 
-	drawCenteredText(screen, "GAME OVER", FontXL, int(PlayAreaHeight*0.25), White)
-	drawCenteredText(screen, scoreDisplay, FontL, int(PlayAreaHeight*0.4), White)
-	drawCenteredText(screen, levelDisplay, FontL, int(PlayAreaHeight*0.5), White)
-	drawCenteredText(screen, "Oops! You've been out-monopolized.", FontL, int(PlayAreaHeight*0.65), White)
-	drawCenteredText(screen, "But don't worry, your data", FontL, int(PlayAreaHeight*0.75), White)
-	drawCenteredText(screen, "will live on forever with us.", FontL, int(PlayAreaHeight*0.85), White)
-
-	drawCenteredText(screen, "Press P to replay or Q to quit", FontM, int(ScreenHeight-ScreenUnit*2), White)
+	ui.DrawText(screen, "center", "GAME OVER", FontXL, PlayAreaHeight*0.25, White)
+	ui.DrawText(screen, "center", scoreDisplay, FontL, PlayAreaHeight*0.4, White)
+	ui.DrawText(screen, "center", levelDisplay, FontL, PlayAreaHeight*0.5, White)
+	ui.DrawText(screen, "center", "Oops! You've been out-monopolized.", FontL, PlayAreaHeight*0.65, White)
+	ui.DrawText(screen, "center", "But don't worry, your data", FontL, PlayAreaHeight*0.75, White)
+	ui.DrawText(screen, "center", "will live on forever with us.", FontL, PlayAreaHeight*0.85, White)
+	ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, ScreenHeight-ScreenUnit*2, White)
 }
 
 // Draws the Goal Page
 func (ui *UI) DrawGoalPage(screen *ebiten.Image, score int8) {
-	ui.DrawGrid(screen)
-	ui.DrawPlayArea(screen)
+	ui.DrawBaseElements(screen)
 
 	// scoreDisplay := fmt.Sprintf("Score: %d", score)
 	// levelDisplay := fmt.Sprintf("Level: XXX")
 
-	drawCenteredText(screen, "CONGRATULATIONS !", FontXL, int(PlayAreaHeight*0.25), White)
-	drawCenteredText(screen, "Master of the Digital Panopticon !", FontL, int(PlayAreaHeight*0.4), White)
-	drawCenteredText(screen, "In the world of Surveillance Capitalism,", FontL, int(PlayAreaHeight*0.5), White)
-	drawCenteredText(screen, "you stand unrivaled !", FontL, int(PlayAreaHeight*0.6), White)
-	drawCenteredText(screen, "A true data supremacist !!!", FontL, int(PlayAreaHeight*0.75), White)
+	ui.DrawText(screen, "center", "CONGRATULATIONS !", FontXL, PlayAreaHeight*0.25, White)
+	ui.DrawText(screen, "center", "Master of the Digital Panopticon !", FontL, PlayAreaHeight*0.4, White)
+	ui.DrawText(screen, "center", "In the world of Surveillance Capitalism,", FontL, PlayAreaHeight*0.5, White)
+	ui.DrawText(screen, "center", "you stand unrivaled !", FontL, PlayAreaHeight*0.6, White)
+	ui.DrawText(screen, "center", "A true data supremacist !!!", FontL, PlayAreaHeight*0.75, White)
+	ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, ScreenHeight-ScreenUnit*2, White)
+}
 
-	drawCenteredText(screen, "Press P to replay or Q to quit", FontM, int(ScreenHeight-ScreenUnit*2), White)
+// Draws text aligned to the specified side (left or right)
+func (ui *UI) DrawText(screen *ebiten.Image, alignment string, txt string, fontFace font.Face, y float32, color color.Color) {
+	// Calculate the text width
+	textRect, _ := font.BoundString(fontFace, txt)
+	textWidth := float32((textRect.Max.X - textRect.Min.X).Round())
+
+	// Calculate the x position based on the specified alignment
+	var x float32
+	if alignment == "left" {
+		x = ScreenUnit
+	} else if alignment == "right" {
+		x = ScreenWidth - textWidth
+	} else {
+		// Default to center if an invalid side is provided
+		x = (ScreenWidth - textWidth) / 2
+	}
+
+	// Draw the aligned text
+	text.Draw(screen, txt, fontFace, int(x), int(y), color)
 }
 
 // SetScore sets the current score to be displayed in the UI
@@ -136,46 +139,4 @@ func (ui *UI) SetGameOver() {
 	ui.gameOver = true
 }
 
-type Welcome struct {
-	UI *UI // UI elements for the welcome page
-}
-
-// func NewWelcome() *Welcome {
-// 	return &Welcome{
-// 		UI: NewUI(),
-// 	}
-// }
-
 // Helper functions
-
-// Draws centered text on the x-axis
-func drawCenteredText(screen *ebiten.Image, txt string, fontFace font.Face, y int, color color.Color) {
-	// Calculate the text width
-	textRect, _ := font.BoundString(fontFace, txt)
-	textWidth := int((textRect.Max.X - textRect.Min.X).Round())
-	x := (int(ScreenWidth) - int(textWidth)) / 2
-
-	// Draw the centered text
-	text.Draw(screen, txt, fontFace, x, y, color)
-}
-
-// Draws text aligned to the specified side (left or right)
-func drawAlignedText(screen *ebiten.Image, side string, txt string, fontFace font.Face, y int, color color.Color) {
-	// Calculate the text width
-	textRect, _ := font.BoundString(fontFace, txt)
-	textWidth := int((textRect.Max.X - textRect.Min.X).Round())
-
-	// Calculate the x position based on the specified side
-	var x int
-	if side == "left" {
-		x = int(ScreenUnit)
-	} else if side == "right" {
-		x = int(ScreenWidth) - textWidth
-	} else {
-		// Default to center if an invalid side is provided
-		x = (int(ScreenWidth) - int(textWidth)) / 2
-	}
-
-	// Draw the aligned text
-	text.Draw(screen, txt, fontFace, x, y, color)
-}
