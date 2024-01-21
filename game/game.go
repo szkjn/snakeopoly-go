@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -22,6 +21,7 @@ type Game struct {
 	UI                       *UI
 	State                    GameState
 	Score                    int8
+	Level                    string
 }
 
 type GameState int
@@ -45,6 +45,8 @@ func NewGame() *Game {
 	initialSpecialDataPoints := make([]SpecialDataPoint, len(specialDataPoints))
 	copy(initialSpecialDataPoints, specialDataPoints)
 
+	initialLevel := specialDataPoints[0].Level
+
 	game := &Game{
 		Snake:                    snake,
 		LastMoveTime:             time.Now(),
@@ -56,6 +58,7 @@ func NewGame() *Game {
 		UI:                       NewUI(),
 		State:                    WelcomeState,
 		Score:                    0,
+		Level:                    initialLevel,
 	}
 	return game
 }
@@ -132,7 +135,7 @@ func (g *Game) ResetGame() {
 
 func (g *Game) handleMacroInput() {
 	// Handle general macro key interactions
-	if g.State == WelcomeState || g.State == GameOverState {
+	if g.State == WelcomeState || g.State == GameOverState || g.State == GoalState {
 
 		// Get the input characters
 		inputChars := ebiten.AppendInputChars(nil)
@@ -149,13 +152,13 @@ func (g *Game) handleMacroInput() {
 			}
 		}
 	} else if g.State == SpecialState {
+
 		// Get the input characters
 		inputChars := ebiten.AppendInputChars(nil)
 
 		// Detect if a key has been pressed
 		if len(inputChars) == 1 {
 			// If "R" has been pressed
-			fmt.Println(inputChars)
 			if inputChars[0] == 114 {
 				g.State = PlayState
 				// If "Q" has been pressed
@@ -219,6 +222,7 @@ func (g *Game) handleSnakeMovementAndCollision(nextHeadX, nextHeadY float32) {
 		if specialDP, isSpecial := g.CurrentDataPoint.(SpecialDataPoint); isSpecial {
 			g.State = SpecialState // Trigger special state on collision with special data point
 			g.CurrentSpecialDataPoint = specialDP
+			g.Level = specialDP.Level
 		}
 
 		// Generate a new data point after handling the current collision

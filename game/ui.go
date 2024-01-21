@@ -73,8 +73,8 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 	}
 	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
 	ui.DrawText(screen, "left", scoreDisplay, FontS, PlayAreaHeight+ScreenUnit*2, White)
-	debug := fmt.Sprintf("CurrentDataPoint: %v", g.CurrentDataPoint)
-	ui.DrawText(screen, "left", debug, FontS, PlayAreaHeight+ScreenUnit*3, White)
+	levelDisplay := fmt.Sprintf("Level: %s", g.Level)
+	ui.DrawText(screen, "right", levelDisplay, FontS, PlayAreaHeight+ScreenUnit*2, White)
 }
 
 // Draws the Special Page
@@ -136,7 +136,7 @@ func (ui *UI) DrawText(screen *ebiten.Image, alignment string, textStr string, f
 	if alignment == "left" {
 		x = ScreenUnit
 	} else if alignment == "right" {
-		x = ScreenWidth - textWidth
+		x = ScreenWidth - textWidth - ScreenUnit
 	} else {
 		// Default to center if an invalid side is provided
 		x = (ScreenWidth - textWidth) / 2
