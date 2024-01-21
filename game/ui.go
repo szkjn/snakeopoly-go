@@ -66,11 +66,14 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 	op.GeoM.Translate(float64(x*ScreenUnit), float64(y*ScreenUnit))
 	DrawDataPoint(screen, g.CurrentDataPoint)
 
-	// Draw the snake
-	for _, segment := range g.Snake.Body {
-		segmentX, segmentY := segment[0]*ScreenUnit, segment[1]*ScreenUnit
-		vector.DrawFilledRect(screen, segmentX, segmentY, SnakeSize, SnakeSize, White, false)
+	// Draw the snake based on visibility state
+	if g.SnakeVisible {
+		for _, segment := range g.Snake.Body {
+			segmentX, segmentY := segment[0]*ScreenUnit, segment[1]*ScreenUnit
+			vector.DrawFilledRect(screen, segmentX, segmentY, SnakeSize, SnakeSize, White, false)
+		}
 	}
+
 	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
 	ui.DrawText(screen, "left", scoreDisplay, FontS, PlayAreaHeight+ScreenUnit*2, White)
 	levelDisplay := fmt.Sprintf("Level: %s", g.Level)

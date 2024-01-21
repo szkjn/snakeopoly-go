@@ -22,6 +22,9 @@ type Game struct {
 	State                    GameState
 	Score                    int8
 	Level                    string
+	Blinking                 bool
+	BlinkTimer               time.Duration
+	SnakeVisible             bool
 }
 
 type GameState int
@@ -32,6 +35,7 @@ const (
 	GameOverState
 	SpecialState
 	GoalState
+	BlinkState
 )
 
 func NewGame() *Game {
@@ -59,6 +63,8 @@ func NewGame() *Game {
 		State:                    WelcomeState,
 		Score:                    0,
 		Level:                    initialLevel,
+		Blinking:                 false,
+		SnakeVisible:             true,
 	}
 	return game
 }
@@ -80,6 +86,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	case GoalState:
 		g.UI.DrawGoalPage(screen, g.Score)
+
+	case BlinkState:
+		g.UI.DrawPlayPage(screen, g)
+
 	}
 }
 
@@ -112,6 +122,21 @@ func (g *Game) Update() error {
 				g.LastMoveTime = currentTime
 			}
 		}
+
+	} else if g.State == BlinkState {
+
+		if time.Since(g.LastMoveTime) >= BlinkFreq {
+			g.SnakeVisible = !g.SnakeVisible
+			g.BlinkTimer += time.Since(g.LastMoveTime)
+			g.LastMoveTime = time.Now()
+		}
+		// Check if blinking duration has elapsed
+		if g.BlinkTimer >= TotalBlinkDuration {
+			g.State = PlayState
+			g.Blinking = false
+			g.SnakeVisible = true
+		}
+
 	} else if g.State == WelcomeState || g.State == SpecialState || g.State == GameOverState {
 		g.handleMacroInput()
 	}
@@ -131,6 +156,14 @@ func (g *Game) ResetGame() {
 	// Reset specialDataPoints to their initial state
 	g.SpecialDataPoints = make([]SpecialDataPoint, len(g.initialSpecialDataPoints))
 	copy(g.SpecialDataPoints, g.initialSpecialDataPoints)
+}
+
+func (g *Game) ResumeGame() {
+	g.State = BlinkState
+	g.LastMoveTime = time.Now()
+	g.Blinking = true
+	g.BlinkTimer = 0
+	g.SnakeVisible = false
 }
 
 func (g *Game) handleMacroInput() {
@@ -160,7 +193,7 @@ func (g *Game) handleMacroInput() {
 		if len(inputChars) == 1 {
 			// If "R" has been pressed
 			if inputChars[0] == 114 {
-				g.State = PlayState
+				g.ResumeGame()
 				// If "Q" has been pressed
 			} else if inputChars[0] == 113 {
 				quitGame()

@@ -2,6 +2,7 @@ package game
 
 import (
 	"image/color"
+	"time"
 
 	"github.com/szkjn/snakeopoly-go/assets"
 )
@@ -25,7 +26,7 @@ const (
 	SnakeSize             float32 = ScreenUnit
 	InitialSnakeLength    float32 = 3
 	SnakeSpeed            float32 = 7
-	SpecialDataPointsRate int8    = 2
+	SpecialDataPointsRate int8    = 1
 )
 
 // Colors
@@ -42,4 +43,10 @@ var (
 	FontL   = assets.MustLoadFont(float64(ScreenUnit * 1.3))
 	FontM   = assets.MustLoadFont(float64(ScreenUnit * 1))
 	FontS   = assets.MustLoadFont(float64(ScreenUnit * 0.7))
+)
+
+// UI effects
+const (
+	TotalBlinkDuration = 1 * time.Second
+	BlinkFreq          = 200 * time.Millisecond
 )
