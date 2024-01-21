@@ -23,8 +23,8 @@ const (
 // Constants related to the snake and data points
 const (
 	SnakeSize             float32 = ScreenUnit
-	InitialSnakeLength    float32 = 3.0
-	SnakeSpeed            float32 = 6.0
+	InitialSnakeLength    float32 = 3
+	SnakeSpeed            float32 = 8
 	SpecialDataPointsRate int8    = 2
 )
 

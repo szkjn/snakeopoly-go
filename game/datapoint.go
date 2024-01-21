@@ -123,16 +123,16 @@ func DrawDataPoint(screen *ebiten.Image, dp DataPointInterface) {
 	// Calculate dimensions and scaling factor
 	dpWidth := float32(img.Bounds().Dx())
 	dpHeight := float32(img.Bounds().Dy())
-	scale := float64(ScreenUnit) / (float64(dpWidth) + float64(ScreenUnit)*0.25)
+	scale := ScreenUnit / (dpWidth + ScreenUnit*0.25)
 
 	// Calculate position
 	x, y := dp.Position()
-	centeredX := x*ScreenUnit + (ScreenUnit-float32(dpWidth))*0.5
-	centeredY := y*ScreenUnit + (ScreenUnit-float32(dpHeight))*0.5
+	centeredX := x*ScreenUnit + (ScreenUnit-dpWidth)*0.5
+	centeredY := y*ScreenUnit + (ScreenUnit-dpHeight)*0.5
 
 	// Draw scaled image
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(scale, scale)
+	op.GeoM.Scale(float64(scale), float64(scale))
 	op.GeoM.Translate(float64(centeredX), float64(centeredY))
 	screen.DrawImage(img, op)
 }

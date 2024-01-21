@@ -17,6 +17,7 @@ type Game struct {
 	initialSpecialDataPoints []SpecialDataPoint
 	SpecialDataPoints        []SpecialDataPoint
 	CurrentDataPoint         DataPointInterface
+	CurrentSpecialDataPoint  SpecialDataPoint
 	UI                       *UI
 	State                    GameState
 	Score                    int8
@@ -67,6 +68,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	case PlayState:
 		g.UI.DrawPlayPage(screen, g)
 
+	case SpecialState:
+		g.UI.DrawSpecialPage(screen, g.CurrentSpecialDataPoint)
+
 	case GameOverState:
 		g.UI.DrawGameOverPage(screen, g.Score)
 
@@ -104,7 +108,7 @@ func (g *Game) Update() error {
 				g.LastMoveTime = currentTime
 			}
 		}
-	} else if g.State == WelcomeState || g.State == GameOverState {
+	} else if g.State == WelcomeState || g.State == SpecialState || g.State == GameOverState {
 		g.handleMacroInput()
 	}
 
@@ -136,6 +140,22 @@ func (g *Game) handleMacroInput() {
 		if len(inputChars) == 1 {
 			// If "P" has been pressed
 			if inputChars[0] == 112 {
+				g.State = PlayState
+				g.ResetGame()
+				// If "Q" has been pressed
+			} else if inputChars[0] == 113 {
+				quitGame()
+			}
+		}
+	} else if g.State == SpecialState {
+
+		// Get the input characters
+		inputChars := ebiten.AppendInputChars(nil)
+
+		// Detect if a key has been pressed
+		if len(inputChars) == 1 {
+			// If "R" has been pressed
+			if inputChars[0] == 106 {
 				g.State = PlayState
 				g.ResetGame()
 				// If "Q" has been pressed
@@ -192,14 +212,17 @@ func (g *Game) generateDataPoint() {
 
 func (g *Game) handleSnakeMovementAndCollision(nextHeadX, nextHeadY float32) {
 	if g.CurrentDataPoint != nil && g.CurrentDataPoint.IsColliding(g.Snake) {
-		// Collision detected, increase score and generate a new data point
+		// Collision detected, increase score
 		g.Score++
-		g.generateDataPoint()
 
-		// Additional logic for special data points
-		if _, isSpecial := g.CurrentDataPoint.(*SpecialDataPoint); isSpecial {
-			// Special data point specific logic
+		// Check if the current data point is special
+		if specialDP, isSpecial := g.CurrentDataPoint.(SpecialDataPoint); isSpecial {
+			g.State = SpecialState // Trigger special state on collision with special data point
+			g.CurrentSpecialDataPoint = specialDP
 		}
+
+		// Generate a new data point after handling the current collision
+		g.generateDataPoint()
 
 		// Add the new head position and handle snake growth
 		g.Snake.Body = append([][2]float32{{nextHeadX, nextHeadY}}, g.Snake.Body...)
