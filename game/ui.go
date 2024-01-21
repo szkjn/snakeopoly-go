@@ -50,10 +50,10 @@ func (ui *UI) DrawPlayArea(screen *ebiten.Image) {
 func (ui *UI) DrawWelcomePage(screen *ebiten.Image) {
 	ui.DrawBaseElements(screen)
 
-	ui.DrawText(screen, "center", "Welcome to the Snakeopoly!", FontL, PlayAreaHeight*0.2, White)
-	ui.DrawText(screen, "center", "Slither your way", FontL, PlayAreaHeight*0.35, White)
-	ui.DrawText(screen, "center", "to Surveillance Sovereignty!", FontL, PlayAreaHeight*0.45, White)
-	ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, ScreenHeight-ScreenUnit*2, White)
+	ui.DrawText(screen, "center", "Welcome to the Snakeopoly!", FontL, 4, White)
+	ui.DrawText(screen, "center", "Slither your way", FontL, 6, White)
+	ui.DrawText(screen, "center", "to Surveillance Sovereignty!", FontL, 7.5, White)
+	ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5, White)
 }
 
 // Draws the Play Page
@@ -75,9 +75,9 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 	}
 
 	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
-	ui.DrawText(screen, "left", scoreDisplay, FontS, PlayAreaHeight+ScreenUnit*2, White)
+	ui.DrawText(screen, "left", scoreDisplay, FontM, 17, White)
 	levelDisplay := fmt.Sprintf("Level: %s", g.Level)
-	ui.DrawText(screen, "right", levelDisplay, FontS, PlayAreaHeight+ScreenUnit*2, White)
+	ui.DrawText(screen, "right", levelDisplay, FontM, 17, White)
 }
 
 // Draws the Special Page
@@ -89,12 +89,12 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, 
 	textStr := specialDP.Text
 	maxLineWidth := int(ScreenWidth) - 10*int(ScreenUnit)
 
-	ui.DrawText(screen, "center", "Congrats! You've just acquired:", FontL, PlayAreaHeight*0.25, White)
-	ui.DrawText(screen, "center", name, FontL, PlayAreaHeight*0.35, White)
+	ui.DrawText(screen, "center", "Congrats! You've just acquired:", FontL, 4, White)
+	ui.DrawText(screen, "center", name, FontL, 5.5, White)
 
-	ui.DrawImage(screen, image, PlayAreaHeight*0.4, 3, "center")
-	ui.DrawMultiLineText(screen, textStr, ScreenWidth*0.33, PlayAreaHeight*0.7, FontM, White, maxLineWidth, currentCharIndex)
-	ui.DrawText(screen, "center", "Press R to resume or Q to quit", FontM, ScreenHeight-ScreenUnit*2, White)
+	ui.DrawImage(screen, image, 6.5, 3, "center")
+	ui.DrawMultiLineText(screen, textStr, ScreenWidth*0.33, 11, FontM, White, maxLineWidth, currentCharIndex)
+	ui.DrawText(screen, "center", "Press R to resume or Q to quit", FontM, 18.5, White)
 }
 
 // Draws the Game Over Page
@@ -104,13 +104,13 @@ func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8) {
 	scoreDisplay := fmt.Sprintf("Score: %d", score)
 	levelDisplay := fmt.Sprintf("Level: XXX")
 
-	ui.DrawText(screen, "center", "GAME OVER", FontXL, PlayAreaHeight*0.25, White)
-	ui.DrawText(screen, "center", scoreDisplay, FontL, PlayAreaHeight*0.4, White)
-	ui.DrawText(screen, "center", levelDisplay, FontL, PlayAreaHeight*0.5, White)
-	ui.DrawText(screen, "center", "Oops! You've been out-monopolized.", FontL, PlayAreaHeight*0.65, White)
-	ui.DrawText(screen, "center", "But don't worry, your data", FontL, PlayAreaHeight*0.75, White)
-	ui.DrawText(screen, "center", "will live on forever with us.", FontL, PlayAreaHeight*0.85, White)
-	ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, ScreenHeight-ScreenUnit*2, White)
+	ui.DrawText(screen, "center", "GAME OVER", FontXL, 4, White)
+	ui.DrawText(screen, "center", scoreDisplay, FontM, 6, White)
+	ui.DrawText(screen, "center", levelDisplay, FontM, 7, White)
+	ui.DrawText(screen, "center", "Oops! You've been out-monopolized.", FontM, 9, White)
+	ui.DrawText(screen, "center", "But don't worry, your data", FontM, 10, White)
+	ui.DrawText(screen, "center", "will live on forever with us.", FontM, 11, White)
+	ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, 18.5, White)
 }
 
 // Draws the Goal Page
@@ -120,19 +120,22 @@ func (ui *UI) DrawGoalPage(screen *ebiten.Image, score int8) {
 	// scoreDisplay := fmt.Sprintf("Score: %d", score)
 	// levelDisplay := fmt.Sprintf("Level: XXX")
 
-	ui.DrawText(screen, "center", "CONGRATULATIONS !", FontXL, PlayAreaHeight*0.25, White)
-	ui.DrawText(screen, "center", "Master of the Digital Panopticon !", FontL, PlayAreaHeight*0.4, White)
-	ui.DrawText(screen, "center", "In the world of Surveillance Capitalism,", FontL, PlayAreaHeight*0.5, White)
-	ui.DrawText(screen, "center", "you stand unrivaled !", FontL, PlayAreaHeight*0.6, White)
-	ui.DrawText(screen, "center", "A true data supremacist !!!", FontL, PlayAreaHeight*0.75, White)
-	ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, ScreenHeight-ScreenUnit*2, White)
+	ui.DrawText(screen, "center", "CONGRATULATIONS !", FontXL, 4, White)
+	ui.DrawText(screen, "center", "Master of the Digital Panopticon !", FontL, 6, White)
+	ui.DrawText(screen, "center", "In the world of Surveillance Capitalism,", FontL, 7.5, White)
+	ui.DrawText(screen, "center", "you stand unrivaled !", FontL, 9, White)
+	ui.DrawText(screen, "center", "A true data supremacist !!!", FontL, 11, White)
+	ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, 18.5, White)
 }
 
 // Draws text aligned to the specified side (left or right)
-func (ui *UI) DrawText(screen *ebiten.Image, alignment string, textStr string, fontFace font.Face, y float32, color color.Color) {
+func (ui *UI) DrawText(screen *ebiten.Image, alignment string, textStr string, fontFace font.Face, yUnits float32, color color.Color) {
 	// Calculate the text width
 	textRect, _ := font.BoundString(fontFace, textStr)
 	textWidth := float32((textRect.Max.X - textRect.Min.X).Round())
+
+	y := int(ScreenUnit*yUnits - ScreenUnit*0.1)
+	// fmt.Println(textStr, y)
 
 	// Calculate the x position based on the specified alignment
 	var x float32
@@ -146,15 +149,16 @@ func (ui *UI) DrawText(screen *ebiten.Image, alignment string, textStr string, f
 	}
 
 	// Draw the aligned text
-	text.Draw(screen, textStr, fontFace, int(x), int(y), color)
+	text.Draw(screen, textStr, fontFace, int(x), y, color)
 }
 
-func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, y float32, fontFace font.Face, clr color.Color, maxLineWidth int, currentCharIndex int) {
+func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, yUnits float32, fontFace font.Face, clr color.Color, maxLineWidth int, currentCharIndex int) {
 
 	// Split the text into words
 	words := strings.Fields(textStr)
 	var lines []string
 	var currentLine string
+	y := int(ScreenUnit*yUnits - ScreenUnit*0.1)
 
 	for _, word := range words {
 		// Check line width with the new word added
@@ -189,7 +193,7 @@ func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, y float
 			line = line[:currentCharIndex-charsDrawn]
 		}
 		lineSpacing := i * int(ScreenUnit)
-		text.Draw(screen, line, fontFace, int(x), int(y)+lineSpacing, clr)
+		text.Draw(screen, line, fontFace, int(x), y+lineSpacing, clr)
 		charsDrawn += len(line)
 		if charsDrawn >= currentCharIndex {
 			break
@@ -198,10 +202,10 @@ func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, y float
 }
 
 // Draw image depending on scale and alignment
-func (ui *UI) DrawImage(screen *ebiten.Image, image *ebiten.Image, y float32, scale float32, alignment string) {
+func (ui *UI) DrawImage(screen *ebiten.Image, image *ebiten.Image, yUnits float32, scale float32, alignment string) {
 	// Get image dimensions, we assume every image is a square (width=height)
 	imgWidth := image.Bounds().Dx()
-	// imgHeight := image.Bounds().Dy()
+	y := int(ScreenUnit*yUnits - ScreenUnit*0.1)
 
 	// Calculate scaled dimensions
 	scaledWidth := float32(imgWidth) * scale
