@@ -85,7 +85,10 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 		vector.DrawFilledRect(screen, segmentX, segmentY, SnakeSize, SnakeSize, White, false)
 	}
 	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
-	drawAlignedText(screen, "left", scoreDisplay, FontL, int(PlayAreaHeight+ScreenUnit*2), White)
+	drawAlignedText(screen, "left", scoreDisplay, FontS, int(PlayAreaHeight+ScreenUnit*2), White)
+	debug := fmt.Sprintf("CurrentDataPoint: %v, IsSpecial: %v", g.CurrentDataPoint, g.CurrentDataPoint.IsSpecial())
+	drawAlignedText(screen, "left", debug, FontS, int(PlayAreaHeight+ScreenUnit*3), White)
+
 }
 
 // Draws the Game Over Page

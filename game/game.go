@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -14,7 +15,6 @@ type Game struct {
 	LastMoveTime      time.Time // Timestamp of the last movement
 	CurrentDir        Direction // Current direction of the snake
 	NextDir           Direction // Next direction to change to*
-	DataPointCounter  int8
 	SpecialDataPoints []SpecialDataPoint
 	CurrentDataPoint  DataPointInterface
 	UI                *UI
@@ -39,11 +39,10 @@ func NewGame() *Game {
 	}
 
 	game := &Game{
-		Snake:             snake,      // Initialize the snake
-		LastMoveTime:      time.Now(), // Initialize lastMoveTime
-		CurrentDir:        DirRight,   // Initialize the direction (e.g., DirRight for right)
-		NextDir:           DirRight,   // Initialize the next direction
-		DataPointCounter:  0,
+		Snake:             snake,             // Initialize the snake
+		LastMoveTime:      time.Now(),        // Initialize lastMoveTime
+		CurrentDir:        DirRight,          // Initialize the direction (e.g., DirRight for right)
+		NextDir:           DirRight,          // Initialize the next direction
 		SpecialDataPoints: specialDataPoints, // Initialize the first data point
 		CurrentDataPoint:  dataPoint,
 		UI:                NewUI(),      // Initialize the UI
@@ -131,12 +130,21 @@ func (g *Game) Update() error {
 	return nil
 }
 func (g *Game) ResetGame() {
-	g.Snake = NewSnake()
+	snake := NewSnake()
+	dataPoint := NewDataPoint(snake)
+	specialDataPoints, err := LoadSpecialDataPoints()
+	if err != nil {
+		log.Fatalf("Failed to load special data points: %v", err)
+	}
+
+	g.Snake = snake
 	g.LastMoveTime = time.Now()
 	g.CurrentDir = DirRight
 	g.NextDir = DirRight
 	g.Score = 0
 	g.State = PlayState
+	g.SpecialDataPoints = specialDataPoints
+	g.CurrentDataPoint = dataPoint
 }
 
 func (g *Game) handleMacroInput() {
@@ -190,13 +198,13 @@ func quitGame() {
 }
 
 func (g *Game) generateDataPoint() {
-	if g.DataPointCounter%SpecialDataPointsRate == 0 && len(g.SpecialDataPoints) > 0 {
+	if g.Score%SpecialDataPointsRate == 0 && len(g.SpecialDataPoints) > 0 {
 		// Use the first special data point
 		g.CurrentDataPoint = NewSpecialDataPoint(g.SpecialDataPoints[0])
 		g.SpecialDataPoints = g.SpecialDataPoints[1:]
+		fmt.Printf("Special data point. Score/Rate: %d\n", g.Score%SpecialDataPointsRate)
 	} else {
 		// Generate a regular data point
 		g.CurrentDataPoint = NewDataPoint(g.Snake)
 	}
-	g.DataPointCounter++
 }

@@ -12,13 +12,15 @@ import (
 type DataPointInterface interface {
 	Position() (float32, float32)
 	Render(screen *ebiten.Image)
+	GetImage() *ebiten.Image
 	IsSpecial() bool
 	IsColliding(snake Snake) bool
 }
 
 // Defines a regular data point in the game
 type DataPoint struct {
-	X, Y float32
+	X, Y  float32
+	Image *ebiten.Image
 }
 
 // Defines a special data point in the game
@@ -29,7 +31,6 @@ type SpecialDataPoint struct {
 	Year  int
 	Text  string
 	Level string
-	Image *ebiten.Image
 }
 
 // Returns xy coordinates of the DataPoint
@@ -37,9 +38,9 @@ func (d DataPoint) Position() (float32, float32) {
 	return d.X, d.Y
 }
 
-// Render for a regular DataPoint
+// Render for a DataPoint
 func (d DataPoint) Render(screen *ebiten.Image) {
-	// Implement rendering logic for a regular DataPoint
+	// Implement rendering logic for a DataPoint
 }
 
 // IsSpecial returns false for regular DataPoint
@@ -57,49 +58,33 @@ func (s SpecialDataPoint) IsSpecial() bool {
 	return true
 }
 
+func (d DataPoint) GetImage() *ebiten.Image {
+	return d.Image
+}
+
+func (s SpecialDataPoint) GetImage() *ebiten.Image {
+	return s.Image // This will refer to DataPoint.Image due to embedding
+}
+
 // DrawDataPoint draws the data point on the screen.
 func DrawDataPoint(screen *ebiten.Image, dp DataPointInterface) {
-	// Check if the data point is special and render accordingly
-	if specialDP, isSpecial := dp.(*SpecialDataPoint); isSpecial {
-		// Get the dimensions of the special data point image
-		dpWidth := float32(specialDP.Image.Bounds().Dx())
-		dpHeight := float32(specialDP.Image.Bounds().Dy())
+	img := dp.GetImage() // Get the image using the interface method
 
-		// Calculate the scaling factor to fit the image within a ScreenUnit
-		scale := float64(ScreenUnit) / (float64(dpWidth) + float64(ScreenUnit)*0.25)
+	// Calculate dimensions and scaling factor
+	dpWidth := float32(img.Bounds().Dx())
+	dpHeight := float32(img.Bounds().Dy())
+	scale := float64(ScreenUnit) / (float64(dpWidth) + float64(ScreenUnit)*0.25)
 
-		// Calculate the position to center the special data point on the cell
-		x, y := specialDP.Position()
+	// Calculate position
+	x, y := dp.Position()
+	centeredX := x*ScreenUnit + (ScreenUnit-float32(dpWidth))*0.5
+	centeredY := y*ScreenUnit + (ScreenUnit-float32(dpHeight))*0.5
 
-		centeredX := x*ScreenUnit + (ScreenUnit-float32(dpWidth))*0.5
-		centeredY := y*ScreenUnit + (ScreenUnit-float32(dpHeight))*0.5
-
-		// Draw the scaled special data point
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Scale(scale, scale)
-		op.GeoM.Translate(float64(centeredX), float64(centeredY))
-		screen.DrawImage(specialDP.Image, op)
-	} else {
-
-		// Get the dimensions of the data point image
-		dpWidth := float32(assets.DataPoint.Bounds().Dx())
-		dpHeight := float32(assets.DataPoint.Bounds().Dy())
-
-		// Calculate the scaling factor to fit the image within a ScreenUnit
-		scale := float64(ScreenUnit) / (float64(dpWidth) + float64(ScreenUnit)*0.25)
-
-		// Calculate the position to center the data point on the cell
-		x, y := dp.Position()
-
-		centeredX := x*ScreenUnit + (ScreenUnit-float32(dpWidth))*0.5
-		centeredY := y*ScreenUnit + (ScreenUnit-float32(dpHeight))*0.5
-
-		// Draw the scaled data point
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Scale(scale, scale)
-		op.GeoM.Translate(float64(centeredX), float64(centeredY))
-		screen.DrawImage(assets.DataPoint, op)
-	}
+	// Draw the scaled data point
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Scale(scale, scale)
+	op.GeoM.Translate(float64(centeredX), float64(centeredY))
+	screen.DrawImage(img, op)
 }
 
 // Creates a new random data point that is not colliding with the snake.
@@ -127,11 +112,11 @@ func NewDataPoint(snake Snake) DataPoint {
 		selected := availablePositions[rand.Intn(len(availablePositions))]
 		x := float32(selected.x)
 		y := float32(selected.y)
-		return DataPoint{X: x, Y: y}
+		return DataPoint{X: x, Y: y, Image: assets.DataPoint}
 	}
 
 	// If no available positions, create a datapoint at a default position within the play area
-	return DataPoint{X: PlayAreaX1 / ScreenUnit, Y: PlayAreaY1 / ScreenUnit}
+	return DataPoint{X: PlayAreaX1 / ScreenUnit, Y: PlayAreaY1 / ScreenUnit, Image: assets.DataPoint}
 }
 
 func NewSpecialDataPoint(special SpecialDataPoint) SpecialDataPoint {
@@ -162,13 +147,18 @@ func LoadSpecialDataPoints() ([]SpecialDataPoint, error) {
 	var specialDataPoints []SpecialDataPoint
 	for _, record := range records[1:] {
 		year, _ := strconv.Atoi(record[2])
+		image := assets.MustLoadImage("images/30x30/" + record[1] + ".png")
 		specialDataPoint := SpecialDataPoint{
+			DataPoint: DataPoint{
+				X:     0,
+				Y:     0,
+				Image: image,
+			},
 			Name:  record[0],
 			Slug:  record[1],
 			Year:  year,
 			Text:  record[3],
 			Level: record[4],
-			Image: assets.MustLoadImage("images/30x30/" + record[1] + ".png"),
 		}
 		specialDataPoints = append(specialDataPoints, specialDataPoint)
 	}
