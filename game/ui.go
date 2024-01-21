@@ -93,7 +93,7 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, 
 	ui.DrawText(screen, "center", name, FontL, 5.5, White)
 
 	ui.DrawImage(screen, image, 6.5, 3, "center")
-	ui.DrawMultiLineText(screen, textStr, ScreenWidth*0.33, 11, FontM, White, maxLineWidth, currentCharIndex)
+	ui.DrawMultiLineText(screen, textStr, 7, 11, FontM, White, maxLineWidth, currentCharIndex)
 	ui.DrawText(screen, "center", "Press R to resume or Q to quit", FontM, 18.5, White)
 }
 
@@ -152,12 +152,13 @@ func (ui *UI) DrawText(screen *ebiten.Image, alignment string, textStr string, f
 	text.Draw(screen, textStr, fontFace, int(x), y, color)
 }
 
-func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, yUnits float32, fontFace font.Face, clr color.Color, maxLineWidth int, currentCharIndex int) {
+func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, xUnits, yUnits float32, fontFace font.Face, clr color.Color, maxLineWidth int, currentCharIndex int) {
 
 	// Split the text into words
 	words := strings.Fields(textStr)
 	var lines []string
 	var currentLine string
+	x := int(ScreenUnit * xUnits)
 	y := int(ScreenUnit*yUnits - ScreenUnit*0.1)
 
 	for _, word := range words {
@@ -193,7 +194,7 @@ func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, x, yUnits 
 			line = line[:currentCharIndex-charsDrawn]
 		}
 		lineSpacing := i * int(ScreenUnit)
-		text.Draw(screen, line, fontFace, int(x), y+lineSpacing, clr)
+		text.Draw(screen, line, fontFace, x, y+lineSpacing, clr)
 		charsDrawn += len(line)
 		if charsDrawn >= currentCharIndex {
 			break
