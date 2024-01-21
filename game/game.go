@@ -18,6 +18,7 @@ type Game struct {
 	SpecialDataPoints        []SpecialDataPoint
 	CurrentDataPoint         DataPointInterface
 	CurrentSpecialDataPoint  SpecialDataPoint
+	LastSpecialDataPoint     bool
 	UI                       *UI
 	State                    GameState
 	Score                    int8
@@ -59,6 +60,7 @@ func NewGame() *Game {
 		initialSpecialDataPoints: initialSpecialDataPoints,
 		SpecialDataPoints:        specialDataPoints,
 		CurrentDataPoint:         dataPoint,
+		LastSpecialDataPoint:     false,
 		UI:                       NewUI(),
 		State:                    WelcomeState,
 		Score:                    0,
@@ -113,7 +115,7 @@ func (g *Game) Update() error {
 
 			// Check collision with play area border
 			if nextHeadX < PlayAreaX1/ScreenUnit || nextHeadX >= PlayAreaX2/ScreenUnit || nextHeadY < PlayAreaY1/ScreenUnit || nextHeadY >= PlayAreaY2/ScreenUnit {
-				g.State = GameOverState
+				g.State = GoalState
 			} else {
 				// Move the snake and handle collision with the current data point
 				g.handleSnakeMovementAndCollision(nextHeadX, nextHeadY)
@@ -137,7 +139,7 @@ func (g *Game) Update() error {
 			g.SnakeVisible = true
 		}
 
-	} else if g.State == WelcomeState || g.State == SpecialState || g.State == GameOverState {
+	} else if g.State == WelcomeState || g.State == SpecialState || g.State == GameOverState || g.State == GoalState {
 		g.handleMacroInput()
 	}
 
@@ -231,14 +233,19 @@ func quitGame() {
 }
 
 func (g *Game) generateDataPoint() {
-	if g.Score%SpecialDataPointsRate == 0 && len(g.SpecialDataPoints) > 0 {
-		// Use the first special data point
-		g.CurrentDataPoint = NewSpecialDataPoint(g.Snake, g.SpecialDataPoints[0])
-		g.SpecialDataPoints = g.SpecialDataPoints[1:]
+	if len(g.SpecialDataPoints) > 0 {
+		if g.Score%SpecialDataPointsRate == 0 {
+			// Use the first special data point
+			g.CurrentDataPoint = NewSpecialDataPoint(g.Snake, g.SpecialDataPoints[0])
+			g.SpecialDataPoints = g.SpecialDataPoints[1:]
 
-		// Check if special data points have run out
-		if len(g.SpecialDataPoints) == 0 {
-			g.State = GoalState
+			// Check if special data points have run out
+			if len(g.SpecialDataPoints) == 0 {
+				g.LastSpecialDataPoint = true
+			}
+		} else {
+			// Generate a regular data point
+			g.CurrentDataPoint = NewDataPoint(g.Snake)
 		}
 	} else {
 		// Generate a regular data point
@@ -256,6 +263,11 @@ func (g *Game) handleSnakeMovementAndCollision(nextHeadX, nextHeadY float32) {
 			g.State = SpecialState // Trigger special state on collision with special data point
 			g.CurrentSpecialDataPoint = specialDP
 			g.Level = specialDP.Level
+
+			// Check if this is the last special data point
+			if g.LastSpecialDataPoint {
+				g.State = GoalState
+			}
 		}
 
 		// Generate a new data point after handling the current collision
