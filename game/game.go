@@ -200,7 +200,7 @@ func quitGame() {
 func (g *Game) generateDataPoint() {
 	if g.Score%SpecialDataPointsRate == 0 && len(g.SpecialDataPoints) > 0 {
 		// Use the first special data point
-		g.CurrentDataPoint = NewSpecialDataPoint(g.SpecialDataPoints[0])
+		g.CurrentDataPoint = NewSpecialDataPoint(g.Snake, g.SpecialDataPoints[0])
 		g.SpecialDataPoints = g.SpecialDataPoints[1:]
 		fmt.Printf("Special data point. Score/Rate: %d\n", g.Score%SpecialDataPointsRate)
 	} else {

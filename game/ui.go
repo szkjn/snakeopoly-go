@@ -86,7 +86,7 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 	}
 	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
 	drawAlignedText(screen, "left", scoreDisplay, FontS, int(PlayAreaHeight+ScreenUnit*2), White)
-	debug := fmt.Sprintf("CurrentDataPoint: %v, IsSpecial: %v", g.CurrentDataPoint, g.CurrentDataPoint.IsSpecial())
+	debug := fmt.Sprintf("CurrentDataPoint: %v", g.CurrentDataPoint)
 	drawAlignedText(screen, "left", debug, FontS, int(PlayAreaHeight+ScreenUnit*3), White)
 
 }
