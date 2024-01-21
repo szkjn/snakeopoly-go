@@ -28,6 +28,8 @@ const (
 	WelcomeState GameState = iota
 	PlayState
 	GameOverState
+	SpecialState
+	GoalState
 )
 
 func NewGame() *Game {
@@ -70,13 +72,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	case GameOverState:
 		g.UI.DrawGameOverPage(screen, g.Score)
 
+	case GoalState:
+		g.UI.DrawGoalPage(screen, g.Score)
 	}
 }
 
 func (g *Game) Update() error {
 	if g.State == PlayState {
 		// Handle user input for changing direction
-		g.handleInput()
+		g.updateDirection()
 
 		// Get the current time and calculate the time elapsed since the last movement
 		currentTime := time.Now()
@@ -85,11 +89,6 @@ func (g *Game) Update() error {
 
 		// Check if it's time to move the snake
 		if elapsedTime >= desiredInterval {
-			// Update the direction of the snake just before it moves
-			if g.CurrentDir != g.NextDir && !g.CurrentDir.IsOpposite(g.NextDir) {
-				g.CurrentDir = g.NextDir
-			}
-
 			// Calculate the new head position
 			moveX, moveY := g.CurrentDir.Vector()
 			headX, headY := g.Snake.Body[0][0], g.Snake.Body[0][1]
@@ -149,8 +148,7 @@ func (g *Game) handleMacroInput() {
 	}
 }
 
-func (g *Game) handleInput() {
-	// Handle arrow key input to change direction
+func (g *Game) updateDirection() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyUp) && g.CurrentDir != DirDown {
 		g.NextDir = DirUp
 	}
@@ -164,7 +162,7 @@ func (g *Game) handleInput() {
 		g.NextDir = DirRight
 	}
 
-	// Apply the next direction if it's not opposite to the current direction
+	// Update the current direction based on the next direction
 	if g.CurrentDir != g.NextDir && !g.CurrentDir.IsOpposite(g.NextDir) {
 		g.CurrentDir = g.NextDir
 	}
@@ -183,6 +181,11 @@ func (g *Game) generateDataPoint() {
 		// Use the first special data point
 		g.CurrentDataPoint = NewSpecialDataPoint(g.Snake, g.SpecialDataPoints[0])
 		g.SpecialDataPoints = g.SpecialDataPoints[1:]
+
+		// Check if special data points have run out
+		if len(g.SpecialDataPoints) == 0 {
+			g.State = GoalState
+		}
 	} else {
 		// Generate a regular data point
 		g.CurrentDataPoint = NewDataPoint(g.Snake)

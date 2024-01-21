@@ -109,6 +109,23 @@ func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8) {
 	drawCenteredText(screen, "Press P to replay or Q to quit", FontM, int(ScreenHeight-ScreenUnit*2), White)
 }
 
+// Draws the Goal Page
+func (ui *UI) DrawGoalPage(screen *ebiten.Image, score int8) {
+	ui.DrawGrid(screen)
+	ui.DrawPlayArea(screen)
+
+	// scoreDisplay := fmt.Sprintf("Score: %d", score)
+	// levelDisplay := fmt.Sprintf("Level: XXX")
+
+	drawCenteredText(screen, "CONGRATULATIONS !", FontXL, int(PlayAreaHeight*0.25), White)
+	drawCenteredText(screen, "Master of the Digital Panopticon !", FontL, int(PlayAreaHeight*0.4), White)
+	drawCenteredText(screen, "In the world of Surveillance Capitalism,", FontL, int(PlayAreaHeight*0.5), White)
+	drawCenteredText(screen, "you stand unrivaled !", FontL, int(PlayAreaHeight*0.6), White)
+	drawCenteredText(screen, "A true data supremacist !!!", FontL, int(PlayAreaHeight*0.75), White)
+
+	drawCenteredText(screen, "Press P to replay or Q to quit", FontM, int(ScreenHeight-ScreenUnit*2), White)
+}
+
 // SetScore sets the current score to be displayed in the UI
 func (ui *UI) SetScore(score int8) {
 	ui.score = score
