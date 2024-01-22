@@ -130,11 +130,11 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, 
 }
 
 // Draws the Game Over Page
-func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8, blinkText bool) {
+func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8, level string, blinkText bool) {
 	ui.DrawBaseElements(screen)
 
 	scoreDisplay := fmt.Sprintf("Score: %d", score)
-	levelDisplay := fmt.Sprintf("Level: XXX")
+	levelDisplay := fmt.Sprintf("Level: %s", level)
 
 	ui.DrawText(screen, "center", "GAME OVER", FontXL, 4)
 	ui.DrawText(screen, "center", scoreDisplay, FontM, 6)

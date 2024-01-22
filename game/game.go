@@ -91,7 +91,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.UI.DrawSpecialPage(screen, g.CurrentSpecialDataPoint, g.CurrentCharIndex, g.BlinkText)
 
 	case GameOverState:
-		g.UI.DrawGameOverPage(screen, g.Score, g.BlinkText)
+		g.UI.DrawGameOverPage(screen, g.Score, g.Level, g.BlinkText)
 
 	case GoalState:
 		g.UI.DrawGoalPage(screen, g.Score, g.BlinkText)
