@@ -116,8 +116,8 @@ func NewSpecialDataPoint(snake Snake, special SpecialDataPoint) SpecialDataPoint
 	return special
 }
 
-// Draw DataPoint or SpecialDataPoint on screen
-func DrawDataPoint(screen *ebiten.Image, dp DataPointInterface) {
+// Place DP image on grid
+func PlaceDataPoint(dp DataPointInterface) (float64, float64, float64) {
 	img := dp.GetImage()
 
 	// Calculate dimensions and scaling factor
@@ -130,9 +130,5 @@ func DrawDataPoint(screen *ebiten.Image, dp DataPointInterface) {
 	centeredX := x*ScreenUnit + (ScreenUnit-dpWidth)*0.5
 	centeredY := y*ScreenUnit + (ScreenUnit-dpHeight)*0.5
 
-	// Draw scaled image
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(float64(scale), float64(scale))
-	op.GeoM.Translate(float64(centeredX), float64(centeredY))
-	screen.DrawImage(img, op)
+	return float64(scale), float64(centeredX), float64(centeredY)
 }

@@ -31,10 +31,10 @@ const (
 
 // Colors
 var (
-	White      = color.RGBA{160, 210, 160, 255}
-	LightWhite = color.RGBA{20, 70, 20, 255}
-	Black      = color.RGBA{20, 40, 20, 255}
-	LightBlack = color.RGBA{160, 190, 160, 255}
+	LighterGreen      = color.RGBA{160, 210, 160, 255}
+	LightGreen = color.RGBA{150, 190, 150, 255}
+	DarkerGreen      = color.RGBA{20, 40, 20, 255}
+	DarkGreen = color.RGBA{20, 70, 20, 255}
 )
 
 // Font

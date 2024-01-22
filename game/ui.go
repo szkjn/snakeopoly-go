@@ -26,15 +26,15 @@ type ColorTheme struct {
 }
 
 var DayTheme = ColorTheme{
-	Background:  White,
-	Grid:        LightBlack,
-	DrawElement: Black,
+	Background:  LighterGreen,
+	Grid:        LightGreen,
+	DrawElement: DarkerGreen,
 }
 
 var NightTheme = ColorTheme{
-	Background:  Black,
-	Grid:        LightWhite,
-	DrawElement: White,
+	Background:  DarkerGreen,
+	Grid:        DarkGreen,
+	DrawElement: LighterGreen,
 }
 
 // Initialize and return a new UI instance
@@ -87,11 +87,8 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image, blinkText bool) {
 func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 	ui.DrawBaseElements(screen)
 
-	// Draw the data point image at the data point coordinates
-	op := &ebiten.DrawImageOptions{}
-	x, y := g.CurrentDataPoint.Position()
-	op.GeoM.Translate(float64(x*ScreenUnit), float64(y*ScreenUnit))
-	DrawDataPoint(screen, g.CurrentDataPoint)
+	scale, x, y := PlaceDataPoint(g.CurrentDataPoint)
+	g.UI.DrawImage(screen, g.CurrentDataPoint.GetImage(), scale, x, y)
 
 	// Draw the snake based on visibility state
 	if g.SnakeVisible {
@@ -119,7 +116,8 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, 
 	ui.DrawText(screen, "center", "Congrats! You've just acquired:", FontL, 4)
 	ui.DrawText(screen, "center", name, FontL, 5.5)
 
-	ui.DrawImage(screen, image, 6.5, 3, "center")
+	scale, x, y := ui.PlaceImage(image, 6.5, 3, "center")
+	ui.DrawImage(screen, image, scale, x, y)
 	ui.DrawMultiLineText(screen, textStr, 7, 11, FontM, maxLineWidth, currentCharIndex)
 
 	totalLength := len(textStr)
@@ -173,7 +171,6 @@ func (ui *UI) DrawText(screen *ebiten.Image, alignment string, textStr string, f
 	textWidth := float32((textRect.Max.X - textRect.Min.X).Round())
 
 	y := int(ScreenUnit*yUnits - ScreenUnit*0.1)
-	// fmt.Println(textStr, y)
 
 	// Calculate the x position based on the specified alignment
 	var x float32
@@ -240,17 +237,11 @@ func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, xUnits, yU
 	}
 }
 
-// Draw image depending on scale and alignment
-func (ui *UI) DrawImage(screen *ebiten.Image, image *ebiten.Image, yUnits float32, scale float32, alignment string) {
-	// Get image dimensions, we assume every image is a square (width=height)
-	imgWidth := image.Bounds().Dx()
-	y := int(ScreenUnit*yUnits - ScreenUnit*0.1)
+func (ui *UI) PlaceImage(img *ebiten.Image, yUnits float32, scale float32, alignment string) (float64, float64, float64) {
+	imgWidth := float32(img.Bounds().Dx())
+	y := ScreenUnit*yUnits - ScreenUnit*0.1
 
-	// Calculate scaled dimensions
 	scaledWidth := float32(imgWidth) * scale
-	// scaledHeight := float32(imgHeight) * scale
-
-	// Calculate position based on alignment
 	var x float32
 	switch alignment {
 	case "center":
@@ -260,14 +251,19 @@ func (ui *UI) DrawImage(screen *ebiten.Image, image *ebiten.Image, yUnits float3
 	case "right":
 		x = ScreenWidth - scaledWidth
 	default:
-		panic("Invalid alignment") // Handle the error appropriately
+		panic("Invalid alignment")
 	}
 
-	// Draw the image
+	return float64(scale), float64(x), float64(y)
+}
+
+// Draw image depending on scale and alignment
+func (ui *UI) DrawImage(screen *ebiten.Image, img *ebiten.Image, scale, x, y float64) {
+	filteredImage := ApplyMonochromeFilter(img, ui.Theme.DrawElement)
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Scale(float64(scale), float64(scale))
-	op.GeoM.Translate(float64(x), float64(y)) // Assuming y position is always 0 for simplicity
-	screen.DrawImage(image, op)
+	op.GeoM.Scale(scale, scale)
+	op.GeoM.Translate(x, y)
+	screen.DrawImage(filteredImage, op)
 }
 
 // SetScore sets the current score to be displayed in the UI
@@ -280,4 +276,39 @@ func (ui *UI) SetGameOver() {
 	ui.gameOver = true
 }
 
-// Helper functions
+// ApplyMonochromeFilter applies a monochrome filter to an image.
+func ApplyMonochromeFilter(img *ebiten.Image, drawElementColor color.Color) *ebiten.Image {
+	// Create a new image with the same size as the original
+	filteredImg := ebiten.NewImageFromImage(img)
+
+	// Convert the drawElementColor to RGBA
+	r, g, b, _ := drawElementColor.RGBA()
+
+	// Normalize RGB values to 0-255 range
+	r, g, b = r>>8, g>>8, b>>8
+
+	// Get the size of the original image
+	width, height := img.Size()
+
+	// Iterate over each pixel
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
+			// Get the original color of the pixel
+			_, _, _, a := img.At(x, y).RGBA()
+
+			// Check if the pixel is not completely transparent
+			if a != 0 {
+				// Set the pixel to the DrawElement color but keep the original alpha
+				filteredColor := color.RGBA{
+					R: uint8(r),
+					G: uint8(g),
+					B: uint8(b),
+					A: uint8(a >> 8), // Convert 16-bit alpha to 8-bit
+				}
+				filteredImg.Set(x, y, filteredColor)
+			}
+		}
+	}
+
+	return filteredImg
+}
