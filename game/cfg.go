@@ -31,9 +31,10 @@ const (
 
 // Colors
 var (
-	LightWhite = color.RGBA{20, 70, 20, 255}
 	White      = color.RGBA{160, 210, 160, 255}
+	LightWhite = color.RGBA{20, 70, 20, 255}
 	Black      = color.RGBA{20, 40, 20, 255}
+	LightBlack = color.RGBA{160, 190, 160, 255}
 )
 
 // Font
@@ -49,5 +50,5 @@ var (
 const (
 	TotalBlinkDuration = 1 * time.Second
 	BlinkFreq          = 200 * time.Millisecond
-	TextAnimationSpeed = 2 * time.Second
+	TextAnimationSpeed = 200 * time.Millisecond
 )

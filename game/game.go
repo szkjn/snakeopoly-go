@@ -10,6 +10,7 @@ import (
 )
 
 type Game struct {
+	Theme                    ColorTheme
 	Snake                    Snake
 	LastMoveTime             time.Time // Timestamp of the last movement
 	CurrentDir               Direction // Current direction of the snake
@@ -26,6 +27,7 @@ type Game struct {
 	Blinking                 bool
 	BlinkTimer               time.Duration
 	SnakeVisible             bool
+	BlinkText                bool
 	TextAnimationTimer       time.Duration
 	CurrentCharIndex         int
 }
@@ -55,6 +57,7 @@ func NewGame() *Game {
 	initialLevel := specialDataPoints[0].Level
 
 	game := &Game{
+		Theme:                    DayTheme,
 		Snake:                    snake,
 		LastMoveTime:             time.Now(),
 		CurrentDir:               DirRight,
@@ -69,6 +72,7 @@ func NewGame() *Game {
 		Level:                    initialLevel,
 		Blinking:                 false,
 		SnakeVisible:             true,
+		BlinkText:                true,
 		CurrentCharIndex:         0,
 	}
 	return game
@@ -78,19 +82,19 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.State {
 
 	case WelcomeState:
-		g.UI.DrawWelcomePage(screen)
+		g.UI.DrawWelcomePage(screen, g.BlinkText)
 
 	case PlayState:
 		g.UI.DrawPlayPage(screen, g)
 
 	case SpecialState:
-		g.UI.DrawSpecialPage(screen, g.CurrentSpecialDataPoint, g.CurrentCharIndex)
+		g.UI.DrawSpecialPage(screen, g.CurrentSpecialDataPoint, g.CurrentCharIndex, g.BlinkText)
 
 	case GameOverState:
-		g.UI.DrawGameOverPage(screen, g.Score)
+		g.UI.DrawGameOverPage(screen, g.Score, g.BlinkText)
 
 	case GoalState:
-		g.UI.DrawGoalPage(screen, g.Score)
+		g.UI.DrawGoalPage(screen, g.Score, g.BlinkText)
 
 	case BlinkState:
 		g.UI.DrawPlayPage(screen, g)
@@ -99,7 +103,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Update() error {
-	if g.State == PlayState {
+	g.handleMacroInput()
+
+	if g.State == WelcomeState {
+		// g.handleMacroInput()
+		// Toggle blinking text
+		if time.Since(g.LastMoveTime) >= BlinkFreq*2 {
+			g.BlinkText = !g.BlinkText
+			g.LastMoveTime = time.Now()
+		}
+	} else if g.State == PlayState {
 		// Handle user input for changing direction
 		g.updateDirection()
 
@@ -142,15 +155,25 @@ func (g *Game) Update() error {
 		}
 
 	} else if g.State == SpecialState {
-		g.handleMacroInput()
+		// g.handleMacroInput()
 		g.TextAnimationTimer += time.Since(g.LastMoveTime)
 		if g.TextAnimationTimer >= TextAnimationSpeed {
 			g.TextAnimationTimer -= TextAnimationSpeed
 			g.CurrentCharIndex++
 		}
+		// Toggle blinking text
+		if time.Since(g.LastMoveTime) >= BlinkFreq*2 {
+			g.BlinkText = !g.BlinkText
+			g.LastMoveTime = time.Now()
+		}
 
-	} else if g.State == WelcomeState || g.State == GameOverState || g.State == GoalState {
-		g.handleMacroInput()
+	} else if g.State == GameOverState || g.State == GoalState {
+		// g.handleMacroInput()
+		// Toggle blinking text
+		if time.Since(g.LastMoveTime) >= BlinkFreq*2 {
+			g.BlinkText = !g.BlinkText
+			g.LastMoveTime = time.Now()
+		}
 	}
 
 	return nil
@@ -176,42 +199,47 @@ func (g *Game) ResumeGame() {
 	g.Blinking = true
 	g.BlinkTimer = 0
 	g.SnakeVisible = false
+	g.CurrentCharIndex = 0
 }
 
 func (g *Game) handleMacroInput() {
-	// Handle general macro key interactions
-	if g.State == WelcomeState || g.State == GameOverState || g.State == GoalState {
 
-		// Get the input characters
-		inputChars := ebiten.AppendInputChars(nil)
+	// Get the input characters
+	inputChars := ebiten.AppendInputChars(nil)
 
-		// Detect if a key has been pressed
-		if len(inputChars) == 1 {
-			// If "P" has been pressed
+	// Detect if a key is pressed
+	if len(inputChars) == 1 {
+
+		// If "1" is pressed
+		if inputChars[0] == 49 {
+			g.UI.ToggleTheme(DayTheme)
+		} else if inputChars[0] == 50 {
+			g.UI.ToggleTheme(NightTheme)
+		}
+
+		if g.State == WelcomeState || g.State == GameOverState || g.State == GoalState {
+
+			// If "P" is pressed
 			if inputChars[0] == 112 {
 				g.State = PlayState
 				g.ResetGame()
-				// If "Q" has been pressed
+				// If "Q" is pressed
 			} else if inputChars[0] == 113 {
 				quitGame()
 			}
-		}
-	} else if g.State == SpecialState {
 
-		// Get the input characters
-		inputChars := ebiten.AppendInputChars(nil)
+		} else if g.State == SpecialState {
 
-		// Detect if a key has been pressed
-		if len(inputChars) == 1 {
-			// If "R" has been pressed
+			// If "R" is pressed
 			if inputChars[0] == 114 {
 				g.ResumeGame()
-				// If "Q" has been pressed
+				// If "Q" is pressed
 			} else if inputChars[0] == 113 {
 				quitGame()
 			}
 		}
 	}
+
 }
 
 func (g *Game) updateDirection() {
