@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/szkjn/snakeopoly-go/assets"
+	"golang.org/x/image/font"
 )
 
 // Constants related to screen and play area dimensions
@@ -31,24 +32,27 @@ const (
 
 // Colors
 var (
-	LighterGreen      = color.RGBA{160, 210, 160, 255}
-	LightGreen = color.RGBA{150, 190, 150, 255}
-	DarkerGreen      = color.RGBA{20, 40, 20, 255}
-	DarkGreen = color.RGBA{20, 70, 20, 255}
+	LighterGreen color.Color = color.RGBA{160, 210, 160, 255}
+	LightGreen   color.Color = color.RGBA{150, 190, 150, 255}
+	DarkerGreen  color.Color = color.RGBA{20, 40, 20, 255}
+	DarkGreen    color.Color = color.RGBA{20, 70, 20, 255}
 )
 
 // Font
 var (
-	FontXXL = assets.MustLoadFont(float64(ScreenUnit * 1.9))
-	FontXL  = assets.MustLoadFont(float64(ScreenUnit * 1.6))
-	FontL   = assets.MustLoadFont(float64(ScreenUnit * 1.3))
-	FontM   = assets.MustLoadFont(float64(ScreenUnit * 1))
-	FontS   = assets.MustLoadFont(float64(ScreenUnit * 0.7))
+	FontXXL font.Face = assets.MustLoadFont(float64(ScreenUnit * 1.9))
+	FontXL  font.Face = assets.MustLoadFont(float64(ScreenUnit * 1.6))
+	FontL   font.Face = assets.MustLoadFont(float64(ScreenUnit * 1.3))
+	FontM   font.Face = assets.MustLoadFont(float64(ScreenUnit * 1))
+	FontS   font.Face = assets.MustLoadFont(float64(ScreenUnit * 0.7))
 )
 
 // UI effects
 const (
-	TotalBlinkDuration = 1 * time.Second
-	BlinkFreq          = 200 * time.Millisecond
-	TextAnimationSpeed = 200 * time.Millisecond
+	TotalBlinkDuration time.Duration = 1 * time.Second
+	BlinkFreq          time.Duration = 200 * time.Millisecond
+	TextAnimationSpeed time.Duration = 200 * time.Millisecond
+	ShapePixelSize     float64       = float64(ScreenUnit) / 6
+	GShapeTime         time.Duration = 1600 * time.Millisecond
+	SixShapeTime       time.Duration = 600 * time.Millisecond
 )

@@ -26,10 +26,15 @@ type Game struct {
 	Level                    string
 	Blinking                 bool
 	BlinkTimer               time.Duration
+	BlinkTextTimer           time.Duration
 	SnakeVisible             bool
 	BlinkText                bool
 	TextAnimationTimer       time.Duration
 	CurrentCharIndex         int
+	WelcomeAnimationTimer    time.Duration
+	IsGShape                 bool
+	WelcomeThemeToggleCount  int
+	WelcomeThemeToggleTimer  time.Time
 }
 
 type GameState int
@@ -74,6 +79,10 @@ func NewGame() *Game {
 		SnakeVisible:             true,
 		BlinkText:                true,
 		CurrentCharIndex:         0,
+		WelcomeAnimationTimer:    0,
+		IsGShape:                 true,
+		WelcomeThemeToggleCount:  0,
+		WelcomeThemeToggleTimer:  time.Now(),
 	}
 	return game
 }
@@ -82,7 +91,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.State {
 
 	case WelcomeState:
-		g.UI.DrawWelcomePage(screen, g.BlinkText)
+		g.UI.DrawWelcomePage(screen, g)
 
 	case PlayState:
 		g.UI.DrawPlayPage(screen, g)
@@ -106,12 +115,29 @@ func (g *Game) Update() error {
 	g.handleMacroInput()
 
 	if g.State == WelcomeState {
-		// g.handleMacroInput()
-		// Toggle blinking text
-		if time.Since(g.LastMoveTime) >= BlinkFreq*2 {
-			g.BlinkText = !g.BlinkText
-			g.LastMoveTime = time.Now()
+		// Animation logic
+		timeElapsed := time.Since(g.LastMoveTime)
+		g.WelcomeAnimationTimer += timeElapsed
+
+		if g.IsGShape && g.WelcomeAnimationTimer >= GShapeTime {
+			g.IsGShape = false
+			g.WelcomeAnimationTimer = 0
+			g.WelcomeThemeToggleCount = 0
+			g.WelcomeThemeToggleTimer = time.Now()
+		} else if !g.IsGShape && g.WelcomeAnimationTimer >= SixShapeTime {
+			g.IsGShape = true
+			g.WelcomeAnimationTimer = 0
 		}
+
+		// Blinking text logic
+		g.BlinkTextTimer += timeElapsed
+		if g.BlinkTextTimer >= BlinkFreq*2 {
+			g.BlinkText = !g.BlinkText
+			g.BlinkTextTimer = 0
+		}
+
+		g.LastMoveTime = time.Now()
+
 	} else if g.State == PlayState {
 		// Handle user input for changing direction
 		g.updateDirection()
@@ -321,3 +347,4 @@ func (g *Game) handleSnakeMovementAndCollision(nextHeadX, nextHeadY float32) {
 		}
 	}
 }
+

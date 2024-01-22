@@ -3,7 +3,9 @@ package game
 import (
 	"fmt"
 	"image/color"
+	"math"
 	"strings"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -72,13 +74,17 @@ func (ui *UI) DrawPlayArea(screen *ebiten.Image) {
 }
 
 // Draw Welcome Page
-func (ui *UI) DrawWelcomePage(screen *ebiten.Image, blinkText bool) {
+func (ui *UI) DrawWelcomePage(screen *ebiten.Image, g *Game) {
 	ui.DrawBaseElements(screen)
 
 	ui.DrawText(screen, "center", "Welcome to the Snakeopoly!", FontL, 4)
 	ui.DrawText(screen, "center", "Slither your way", FontL, 6)
 	ui.DrawText(screen, "center", "to Surveillance Sovereignty!", FontL, 7.5)
-	if blinkText {
+
+	// Draw the welcome animation
+	ui.DrawWelcomeAnimation(screen, g)
+
+	if g.BlinkText {
 		ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5)
 	}
 }
@@ -276,7 +282,7 @@ func (ui *UI) SetGameOver() {
 	ui.gameOver = true
 }
 
-// ApplyMonochromeFilter applies a monochrome filter to an image.
+// Applies a monochrome filter to an image
 func ApplyMonochromeFilter(img *ebiten.Image, drawElementColor color.Color) *ebiten.Image {
 	// Create a new image with the same size as the original
 	filteredImg := ebiten.NewImageFromImage(img)
@@ -311,4 +317,58 @@ func ApplyMonochromeFilter(img *ebiten.Image, drawElementColor color.Color) *ebi
 	}
 
 	return filteredImg
+}
+
+// Draw pixelated shape given a 2D array
+func (ui *UI) DrawChar(screen *ebiten.Image, char [][]int, x, y float64) {
+	for i, row := range char {
+		for j, pixel := range row {
+			if pixel == 1 {
+				op := &ebiten.DrawImageOptions{}
+				op.GeoM.Scale(float64(ShapePixelSize)/4, float64(ShapePixelSize)/4)
+				op.GeoM.Translate(x+float64(j)*float64(ShapePixelSize), y+float64(i)*float64(ShapePixelSize))
+
+				img := ebiten.NewImage(int(math.Round(ShapePixelSize)), int(math.Round(ShapePixelSize)))
+				img.Fill(ui.Theme.DrawElement)
+				screen.DrawImage(img, op)
+			}
+		}
+	}
+}
+
+// DrawWelcomeAnimation draws the GShape and SixShape alternately
+func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game) {
+
+	// Calculate the center of the shape
+	shapeWidth := float64(len(GShape)) * ShapePixelSize
+	centerX := float64(ScreenWidth)/2 - float64(shapeWidth)/2
+
+	if !g.IsGShape {
+
+		ui.BlinkTheme(g)
+
+		// Draw the shape
+		ui.DrawChar(screen, SixShape, centerX, float64(ScreenHeight)/2)
+		ui.DrawChar(screen, SixShape, centerX-shapeWidth-ShapePixelSize, float64(ScreenHeight)/2)
+		ui.DrawChar(screen, SixShape, centerX+shapeWidth+ShapePixelSize, float64(ScreenHeight)/2)
+
+	} else {
+		ui.DrawChar(screen, GShape, centerX, float64(ScreenHeight)/2)
+	}
+}
+
+func (ui *UI) BlinkTheme(g *Game) {
+	if time.Since(g.WelcomeThemeToggleTimer) >= SixShapeTime/20 {
+		if g.WelcomeThemeToggleCount < 6 {
+			if ui.Theme == DayTheme {
+				ui.Theme = NightTheme
+			} else {
+				ui.Theme = DayTheme
+			}
+			g.WelcomeThemeToggleCount++
+			g.WelcomeThemeToggleTimer = time.Now()
+		} else {
+			g.WelcomeThemeToggleCount = 0
+		}
+	}
 }

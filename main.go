@@ -9,7 +9,7 @@ import (
 
 func runGame() error {
 	ebiten.SetWindowSize(int(game.ScreenWidth), int(game.ScreenHeight))
-	ebiten.SetWindowTitle("Snake Game")
+	ebiten.SetWindowTitle("The Snakeopoly")
 
 	g := game.NewGame()
 
