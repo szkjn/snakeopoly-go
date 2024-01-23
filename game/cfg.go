@@ -27,7 +27,7 @@ const (
 	SnakeSize             float32 = ScreenUnit
 	InitialSnakeLength    float32 = 3
 	SnakeSpeed            float32 = 7
-	SpecialDataPointsRate int8    = 1
+	SpecialDataPointsRate int8    = 2
 )
 
 // Colors

@@ -100,9 +100,11 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 
 	// Draw the snake based on visibility state
 	if g.SnakeVisible {
+		snakeImage := g.Snake.GetImage() // Get the snake image
 		for _, segment := range g.Snake.Body {
 			segmentX, segmentY := segment[0]*ScreenUnit, segment[1]*ScreenUnit
-			vector.DrawFilledRect(screen, segmentX, segmentY, SnakeSize, SnakeSize, ui.Theme.DrawElement, false)
+			// Draw the snake segment image
+			g.UI.DrawImage(screen, snakeImage, 1.0, float64(segmentX), float64(segmentY)) // Assuming scale = 1.0 for snake segments
 		}
 	}
 

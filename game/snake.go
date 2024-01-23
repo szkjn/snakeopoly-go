@@ -1,8 +1,14 @@
 package game
 
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/szkjn/snakeopoly-go/assets"
+)
+
 // Define the snake with a slice of x,y coordinates for its body
 type Snake struct {
-	Body [][2]float32
+	Body  [][2]float32
+	Image *ebiten.Image
 }
 
 // Possible directions the snake can move in
@@ -15,6 +21,11 @@ const (
 	DirLeft
 	DirRight
 )
+
+func (s Snake) GetImage() *ebiten.Image {
+	s.Image = assets.MustLoadImage("images/30x30/googlevil.png")
+	return s.Image
+}
 
 // Check if the given direction is opposite to the current direction
 func (d Direction) IsOpposite(other Direction) bool {
