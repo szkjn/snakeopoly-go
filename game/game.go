@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -36,6 +37,7 @@ type Game struct {
 	WelcomeThemeToggleCount  int
 	BlinkCounter             int
 	WelcomeThemeToggleTimer  time.Time
+	DebugMode                bool
 }
 
 type GameState int
@@ -84,6 +86,7 @@ func NewGame() *Game {
 		IsGShape:                 true,
 		WelcomeThemeToggleCount:  0,
 		WelcomeThemeToggleTimer:  time.Now(),
+		DebugMode:                false,
 	}
 	return game
 }
@@ -98,13 +101,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.UI.DrawPlayPage(screen, g)
 
 	case SpecialState:
-		g.UI.DrawSpecialPage(screen, g.CurrentSpecialDataPoint, g.CurrentCharIndex, g.BlinkText)
+		g.UI.DrawSpecialPage(screen, g)
 
 	case GameOverState:
-		g.UI.DrawGameOverPage(screen, g.Score, g.Level, g.BlinkText)
+		g.UI.DrawGameOverPage(screen, g)
 
 	case GoalState:
-		g.UI.DrawGoalPage(screen, g.Score, g.BlinkText)
+		g.UI.DrawGoalPage(screen, g)
 
 	case BlinkState:
 		g.UI.DrawPlayPage(screen, g)
@@ -224,6 +227,7 @@ func (g *Game) ResetGame() {
 	// Reset specialDataPoints to their initial state
 	g.SpecialDataPoints = make([]SpecialDataPoint, len(g.initialSpecialDataPoints))
 	copy(g.SpecialDataPoints, g.initialSpecialDataPoints)
+	g.Level = g.initialSpecialDataPoints[0].Level
 }
 
 func (g *Game) ResumeGame() {
@@ -242,7 +246,11 @@ func (g *Game) handleMacroInput() {
 
 	// Detect if a key is pressed
 	if len(inputChars) == 1 {
-
+		// If "d" is pressed
+		if inputChars[0] == 100 {
+			g.DebugMode = !g.DebugMode
+			fmt.Println("debugmode")
+		}
 		// If "1" is pressed
 		// if inputChars[0] == 49 {
 		// 	g.UI.ToggleTheme(DayTheme)

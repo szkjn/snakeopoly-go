@@ -57,11 +57,13 @@ func (ui *UI) ToggleTheme(theme ColorTheme) {
 }
 
 // Draw base elements common to all displays
-func (ui *UI) DrawBaseElements(screen *ebiten.Image) {
+func (ui *UI) DrawBaseElements(screen *ebiten.Image, debugMode bool) {
 	screen.Fill(ui.Theme.Background)
-	ui.DrawGrid(screen)
+	if debugMode {
+		ui.DrawGrid(screen)
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS  %0.0f\nTPS  %0.0f\n", ebiten.ActualFPS(), ebiten.ActualTPS()))
+	}
 	ui.DrawPlayArea(screen)
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS  %0.0f\nTPS  %0.0f\n", ebiten.ActualFPS(), ebiten.ActualTPS()))
 }
 
 // Draw grid lines on screen
@@ -83,7 +85,7 @@ func (ui *UI) DrawPlayArea(screen *ebiten.Image) {
 
 // Draw Welcome Page
 func (ui *UI) DrawWelcomePage(screen *ebiten.Image, g *Game) {
-	ui.DrawBaseElements(screen)
+	ui.DrawBaseElements(screen, g.DebugMode)
 
 	ui.DrawText(screen, "center", "Welcome to the Google's Snakeopoly!", FontL, 4)
 	ui.DrawText(screen, "center", "Slither your way", FontL, 6)
@@ -99,7 +101,7 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image, g *Game) {
 
 // Draws the Play Page
 func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
-	ui.DrawBaseElements(screen)
+	ui.DrawBaseElements(screen, g.DebugMode)
 
 	scale, x, y := PlaceDataPoint(g.CurrentDataPoint)
 	g.UI.DrawImage(screen, g.CurrentDataPoint.GetImage(), scale, x, y)
@@ -121,12 +123,12 @@ func (ui *UI) DrawPlayPage(screen *ebiten.Image, g *Game) {
 }
 
 // Draws the Special Page
-func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, currentCharIndex int, blinkText bool) {
-	ui.DrawBaseElements(screen)
+func (ui *UI) DrawSpecialPage(screen *ebiten.Image, g *Game) {
+	ui.DrawBaseElements(screen, g.DebugMode)
 
-	name := specialDP.Name
-	image := specialDP.Image
-	textStr := specialDP.Text
+	name := g.CurrentSpecialDataPoint.Name
+	image := g.CurrentSpecialDataPoint.Image
+	textStr := g.CurrentSpecialDataPoint.Text
 	maxLineWidth := int(ScreenWidth) - 11*int(ScreenUnit)
 
 	ui.DrawText(screen, "center", "Congrats! You've just acquired:", FontL, 3.5)
@@ -134,29 +136,31 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, 
 
 	scale, x, y := ui.PlaceImage(image, 6, 3, "center")
 	ui.DrawImage(screen, image, scale, x, y)
-	ui.DrawMultiLineText(screen, textStr, 7.5, 10.5, FontM, maxLineWidth, currentCharIndex)
+	ui.DrawMultiLineText(screen, textStr, 7.5, 10.5, FontM, maxLineWidth, g.CurrentCharIndex)
 
-	// ui.DrawImage(screen, assets.GooglevilImg, 3.0, float64(ScreenUnit)*2.5, float64(PlayAreaHeight)*0.65)
 	ui.DrawEvil(screen, float64(ScreenUnit)*2, float64(PlayAreaHeight)-float64(ScreenUnit)*5)
-
-	// ui.DrawGEvil(screen, float64(ScreenUnit)*2.5, float64(PlayAreaHeight)*0.65)
 	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
+
+	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
+	ui.DrawText(screen, "left", scoreDisplay, FontM, 17)
+	levelDisplay := fmt.Sprintf("Level: %s", g.Level)
+	ui.DrawText(screen, "right", levelDisplay, FontM, 17)
 
 	totalLength := len(textStr)
 
-	if currentCharIndex >= totalLength {
-		if blinkText {
+	if g.CurrentCharIndex >= totalLength {
+		if g.BlinkText {
 			ui.DrawText(screen, "center", "Press R to resume or Q to quit", FontM, 18.5)
 		}
 	}
 }
 
 // Draws the Game Over Page
-func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8, level string, blinkText bool) {
-	ui.DrawBaseElements(screen)
+func (ui *UI) DrawGameOverPage(screen *ebiten.Image, g *Game) {
+	ui.DrawBaseElements(screen, g.DebugMode)
 
-	scoreDisplay := fmt.Sprintf("Score: %d", score)
-	levelDisplay := fmt.Sprintf("Level: %s", level)
+	scoreDisplay := fmt.Sprintf("Score: %d", g.Score)
+	levelDisplay := fmt.Sprintf("Level: %s", g.Level)
 
 	ui.DrawText(screen, "center", "GAME OVER", FontXL, 4)
 	ui.DrawText(screen, "center", scoreDisplay, FontM, 6)
@@ -167,14 +171,14 @@ func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8, level string, b
 
 	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
-	if blinkText {
+	if g.BlinkText {
 		ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5)
 	}
 }
 
 // Draws the Goal Page
-func (ui *UI) DrawGoalPage(screen *ebiten.Image, score int8, blinkText bool) {
-	ui.DrawBaseElements(screen)
+func (ui *UI) DrawGoalPage(screen *ebiten.Image, g *Game) {
+	ui.DrawBaseElements(screen, g.DebugMode)
 
 	// scoreDisplay := fmt.Sprintf("Score: %d", score)
 	// levelDisplay := fmt.Sprintf("Level: XXX")
@@ -186,7 +190,7 @@ func (ui *UI) DrawGoalPage(screen *ebiten.Image, score int8, blinkText bool) {
 	ui.DrawText(screen, "center", "A true data supremacist !!!", FontL, 13)
 	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
-	if blinkText {
+	if g.BlinkText {
 		ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, 18.5)
 	}
 }
