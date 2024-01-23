@@ -36,6 +36,9 @@ var (
 	LightGreen   color.Color = color.RGBA{160, 200, 160, 255}
 	DarkerGreen  color.Color = color.RGBA{20, 40, 20, 255}
 	DarkGreen    color.Color = color.RGBA{20, 70, 20, 255}
+	DarkerRed    color.Color = color.RGBA{40, 10, 10, 255}
+	DarkRed      color.Color = color.RGBA{70, 10, 10, 255}
+	LighterRed   color.Color = color.RGBA{210, 60, 60, 255}
 )
 
 // Font

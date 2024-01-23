@@ -41,6 +41,12 @@ var NightTheme = ColorTheme{
 	DrawElement: LighterGreen,
 }
 
+var ApocalypseTheme = ColorTheme{
+	Background:  DarkerRed,
+	Grid:        DarkRed,
+	DrawElement: LighterRed,
+}
+
 // Initialize and return a new UI instance
 func NewUI() *UI {
 	return &UI{score: 0, gameOver: false, Theme: DayTheme}
@@ -80,14 +86,13 @@ func (ui *UI) DrawPlayArea(screen *ebiten.Image) {
 func (ui *UI) DrawWelcomePage(screen *ebiten.Image, g *Game) {
 	ui.DrawBaseElements(screen)
 
-	ui.DrawText(screen, "center", "Welcome to the Snakeopoly!", FontL, 4)
+	ui.DrawText(screen, "center", "Welcome to the Google's Snakeopoly!", FontL, 4)
 	ui.DrawText(screen, "center", "Slither your way", FontL, 6)
 	ui.DrawText(screen, "center", "to Surveillance Sovereignty!", FontL, 7.5)
 
 	// Draw the welcome animation
 	ui.DrawWelcomeAnimation(screen, g, ui.Theme)
 	// ui.DrawEvil(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
-	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	if g.BlinkText {
 		ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5)
@@ -355,6 +360,11 @@ func (ui *UI) DrawChar(screen *ebiten.Image, char [][]int, x, y float64) {
 	}
 }
 
+func (ui *UI) DrawFlower(screen *ebiten.Image, y float64) {
+	ui.DrawChar(screen, FlowerShape, float64(ScreenUnit), y)
+	ui.DrawChar(screen, FlowerShape, float64(ScreenWidth)/2, y)
+}
+
 func (ui *UI) DrawFire(screen *ebiten.Image, y float64) {
 	ui.DrawChar(screen, FireShape, float64(ScreenUnit), y)
 	ui.DrawChar(screen, FireShape, float64(ScreenWidth)/2, y)
@@ -383,16 +393,17 @@ func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game, initialUserThe
 	centerX := float64(ScreenWidth)/2 - float64(shapeWidth)/2
 
 	if !g.IsGShape {
-
-		ui.BlinkTheme(g, initialUserTheme)
-
+		ui.Theme = ApocalypseTheme
+		// ui.BlinkTheme(g, initialUserTheme)
 		// Draw the shape
 		ui.DrawChar(screen, SixShape, centerX, float64(PlayAreaHeight)*0.65)
 		ui.DrawChar(screen, SixShape, centerX-shapeWidth-ShapePixelSize, float64(PlayAreaHeight)*0.65)
 		ui.DrawChar(screen, SixShape, centerX+shapeWidth+ShapePixelSize, float64(PlayAreaHeight)*0.65)
+		ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	} else {
 		ui.Theme = DayTheme
+		ui.DrawFlower(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 		ui.DrawChar(screen, GShape, centerX, float64(PlayAreaHeight)*0.65)
 	}
 }
