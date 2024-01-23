@@ -34,9 +34,6 @@ type Game struct {
 	CurrentCharIndex         int
 	WelcomeAnimationTimer    time.Duration
 	IsGShape                 bool
-	WelcomeThemeToggleCount  int
-	BlinkCounter             int
-	WelcomeThemeToggleTimer  time.Time
 	DebugMode                bool
 }
 
@@ -84,8 +81,6 @@ func NewGame() *Game {
 		CurrentCharIndex:         0,
 		WelcomeAnimationTimer:    0,
 		IsGShape:                 true,
-		WelcomeThemeToggleCount:  0,
-		WelcomeThemeToggleTimer:  time.Now(),
 		DebugMode:                false,
 	}
 	return game
@@ -126,8 +121,6 @@ func (g *Game) Update() error {
 		if g.IsGShape && g.WelcomeAnimationTimer >= GShapeTime {
 			g.IsGShape = false
 			g.WelcomeAnimationTimer = 0
-			g.WelcomeThemeToggleCount = 0
-			g.WelcomeThemeToggleTimer = time.Now()
 		} else if !g.IsGShape && g.WelcomeAnimationTimer >= SixShapeTime {
 			g.IsGShape = true
 			g.WelcomeAnimationTimer = 0

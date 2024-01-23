@@ -5,7 +5,6 @@ import (
 	"image/color"
 	"math"
 	"strings"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -397,7 +396,6 @@ func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game, initialUserThe
 
 	if !g.IsGShape {
 		ui.Theme = ApocalypseTheme
-		// ui.BlinkTheme(g, initialUserTheme)
 		// Draw the shape
 		ui.DrawChar(screen, SixShape, centerX, float64(PlayAreaHeight)*0.65, 8)
 		ui.DrawChar(screen, SixShape, centerX-shapeWidth-ShapePixelSize, float64(PlayAreaHeight)*0.65, 8)
@@ -408,21 +406,5 @@ func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game, initialUserThe
 		ui.Theme = DayTheme
 		ui.DrawFlower(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 		ui.DrawChar(screen, GShape, centerX, float64(PlayAreaHeight)*0.65, 4)
-	}
-}
-
-func (ui *UI) BlinkTheme(g *Game, initialUserTheme ColorTheme) {
-	if time.Since(g.WelcomeThemeToggleTimer) >= SixShapeTime/8 {
-		if g.WelcomeThemeToggleCount < 4 {
-			if ui.Theme == DayTheme {
-				ui.Theme = NightTheme
-			} else {
-				ui.Theme = DayTheme
-			}
-			g.WelcomeThemeToggleCount++
-			g.WelcomeThemeToggleTimer = time.Now()
-		} else {
-			g.WelcomeThemeToggleCount = 0
-		}
 	}
 }
