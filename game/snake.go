@@ -61,13 +61,23 @@ func (d Direction) Vector() (int, int) {
 func NewSnake() Snake {
 	body := make([][2]float32, int(InitialSnakeLength))
 
-	// Set the initial position of the snake's head and align the body towards the left
+	// Set the initial position of the snake's head
 	startX := (PlayAreaX1 / SnakeSize) + (PlayAreaX1 * 3 / SnakeSize)
 	startY := (PlayAreaY1 / SnakeSize) + (PlayAreaY1 * 4 / SnakeSize)
 
+	// Align the body towards the left of the head
 	for i := 0; i < int(InitialSnakeLength); i++ {
-		body[i] = [2]float32{startX + float32(i), startY}
+		body[i] = [2]float32{startX - float32(i), startY}
 	}
 
 	return Snake{Body: body}
+}
+
+func (s *Snake) CollidesWithItself(nextHeadX, nextHeadY float32) bool {
+	for _, segment := range s.Body[1:] { // Start from 1 to skip the head
+		if segment[0] == nextHeadX && segment[1] == nextHeadY {
+			return true
+		}
+	}
+	return false
 }

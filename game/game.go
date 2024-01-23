@@ -159,6 +159,9 @@ func (g *Game) Update() error {
 			// Check collision with play area border
 			if nextHeadX < PlayAreaX1/ScreenUnit || nextHeadX >= PlayAreaX2/ScreenUnit || nextHeadY < PlayAreaY1/ScreenUnit || nextHeadY >= PlayAreaY2/ScreenUnit {
 				g.State = GameOverState
+				// Check collision with itself
+			} else if g.Snake.CollidesWithItself(nextHeadX, nextHeadY) {
+				g.State = GameOverState
 			} else {
 				// Move the snake and handle collision with the current data point
 				g.handleSnakeMovementAndCollision(nextHeadX, nextHeadY)
