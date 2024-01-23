@@ -142,11 +142,12 @@ func (g *Game) Update() error {
 	} else if g.State == PlayState {
 		// Handle user input for changing direction
 		g.updateDirection()
+		g.UI.Theme = DayTheme
 
 		// Get the current time and calculate the time elapsed since the last movement
 		currentTime := time.Now()
 		elapsedTime := currentTime.Sub(g.LastMoveTime)
-		desiredInterval := time.Second/ time.Duration(SnakeSpeed)
+		desiredInterval := time.Second / time.Duration(SnakeSpeed)
 
 		// Check if it's time to move the snake
 		if elapsedTime >= desiredInterval {
@@ -172,6 +173,8 @@ func (g *Game) Update() error {
 		}
 
 	} else if g.State == BlinkState {
+		g.UI.Theme = DayTheme
+
 		if time.Since(g.LastMoveTime) >= BlinkFreq {
 			g.SnakeVisible = !g.SnakeVisible
 			g.BlinkTimer += time.Since(g.LastMoveTime)
@@ -185,7 +188,7 @@ func (g *Game) Update() error {
 		}
 
 	} else if g.State == SpecialState {
-		// g.handleMacroInput()
+		g.UI.Theme = ApocalypseTheme
 		g.TextAnimationTimer += time.Since(g.LastMoveTime)
 		if g.TextAnimationTimer >= TextAnimationSpeed {
 			g.TextAnimationTimer -= TextAnimationSpeed
@@ -198,7 +201,7 @@ func (g *Game) Update() error {
 		}
 
 	} else if g.State == GameOverState || g.State == GoalState {
-		// g.handleMacroInput()
+		g.UI.Theme = ApocalypseTheme
 		// Toggle blinking text
 		if time.Since(g.LastMoveTime) >= BlinkFreq*2 {
 			g.BlinkText = !g.BlinkText
@@ -241,11 +244,11 @@ func (g *Game) handleMacroInput() {
 	if len(inputChars) == 1 {
 
 		// If "1" is pressed
-		if inputChars[0] == 49 {
-			g.UI.ToggleTheme(DayTheme)
-		} else if inputChars[0] == 50 {
-			g.UI.ToggleTheme(NightTheme)
-		}
+		// if inputChars[0] == 49 {
+		// 	g.UI.ToggleTheme(DayTheme)
+		// } else if inputChars[0] == 50 {
+		// 	g.UI.ToggleTheme(NightTheme)
+		// }
 
 		if g.State == WelcomeState || g.State == GameOverState || g.State == GoalState {
 

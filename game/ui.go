@@ -11,7 +11,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/szkjn/snakeopoly-go/assets"
 	"golang.org/x/image/font"
 )
 
@@ -92,7 +91,6 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image, g *Game) {
 
 	// Draw the welcome animation
 	ui.DrawWelcomeAnimation(screen, g, ui.Theme)
-	// ui.DrawEvil(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	if g.BlinkText {
 		ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5)
@@ -138,7 +136,8 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, 
 	ui.DrawImage(screen, image, scale, x, y)
 	ui.DrawMultiLineText(screen, textStr, 7.5, 10.5, FontM, maxLineWidth, currentCharIndex)
 
-	ui.DrawImage(screen, assets.GooglevilImg, 3.0, float64(ScreenUnit)*2.5, float64(PlayAreaHeight)*0.65)
+	// ui.DrawImage(screen, assets.GooglevilImg, 3.0, float64(ScreenUnit)*2.5, float64(PlayAreaHeight)*0.65)
+	ui.DrawEvil(screen, float64(ScreenUnit)*2, float64(PlayAreaHeight)-float64(ScreenUnit)*5)
 
 	// ui.DrawGEvil(screen, float64(ScreenUnit)*2.5, float64(PlayAreaHeight)*0.65)
 	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
@@ -344,12 +343,12 @@ func ApplyMonochromeFilter(img *ebiten.Image, drawElementColor color.Color) *ebi
 }
 
 // Draw pixelated shape given a 2D array
-func (ui *UI) DrawChar(screen *ebiten.Image, char [][]int, x, y float64) {
+func (ui *UI) DrawChar(screen *ebiten.Image, char [][]int, x, y, pixelSize float64) {
 	for i, row := range char {
 		for j, pixel := range row {
 			if pixel == 1 {
 				op := &ebiten.DrawImageOptions{}
-				op.GeoM.Scale(float64(ShapePixelSize)/4, float64(ShapePixelSize)/4)
+				op.GeoM.Scale(ShapePixelSize/pixelSize, ShapePixelSize/pixelSize)
 				op.GeoM.Translate(x+float64(j)*float64(ShapePixelSize), y+float64(i)*float64(ShapePixelSize))
 
 				img := ebiten.NewImage(int(math.Round(ShapePixelSize)), int(math.Round(ShapePixelSize)))
@@ -361,21 +360,21 @@ func (ui *UI) DrawChar(screen *ebiten.Image, char [][]int, x, y float64) {
 }
 
 func (ui *UI) DrawFlower(screen *ebiten.Image, y float64) {
-	ui.DrawChar(screen, FlowerShape, float64(ScreenUnit), y)
-	ui.DrawChar(screen, FlowerShape, float64(ScreenWidth)/2, y)
+	ui.DrawChar(screen, FlowerShape, float64(ScreenUnit), y, 4)
+	ui.DrawChar(screen, FlowerShape, float64(ScreenWidth)/2, y, 4)
 }
 
 func (ui *UI) DrawFire(screen *ebiten.Image, y float64) {
-	ui.DrawChar(screen, FireShape, float64(ScreenUnit), y)
-	ui.DrawChar(screen, FireShape, float64(ScreenWidth)/2, y)
+	ui.DrawChar(screen, FireShape, float64(ScreenUnit), y, 8)
+	ui.DrawChar(screen, FireShape, float64(ScreenWidth)/2, y, 8)
 }
 
-func (ui *UI) DrawEvil(screen *ebiten.Image, y float64) {
-	ui.DrawChar(screen, EvilShape, float64(ScreenUnit), y)
+func (ui *UI) DrawEvil(screen *ebiten.Image, x, y float64) {
+	ui.DrawChar(screen, EvilShape, x, y, 8)
 }
 
 func (ui *UI) DrawGEvil(screen *ebiten.Image, x, y float64) {
-	ui.DrawChar(screen, GEvilShape, x, y)
+	ui.DrawChar(screen, GEvilShape, x, y, 8)
 }
 
 func (ui *UI) DrawAsciiArt(screen *ebiten.Image, asciiArt []string, x, y int) {
@@ -396,15 +395,15 @@ func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game, initialUserThe
 		ui.Theme = ApocalypseTheme
 		// ui.BlinkTheme(g, initialUserTheme)
 		// Draw the shape
-		ui.DrawChar(screen, SixShape, centerX, float64(PlayAreaHeight)*0.65)
-		ui.DrawChar(screen, SixShape, centerX-shapeWidth-ShapePixelSize, float64(PlayAreaHeight)*0.65)
-		ui.DrawChar(screen, SixShape, centerX+shapeWidth+ShapePixelSize, float64(PlayAreaHeight)*0.65)
+		ui.DrawChar(screen, SixShape, centerX, float64(PlayAreaHeight)*0.65, 8)
+		ui.DrawChar(screen, SixShape, centerX-shapeWidth-ShapePixelSize, float64(PlayAreaHeight)*0.65, 8)
+		ui.DrawChar(screen, SixShape, centerX+shapeWidth+ShapePixelSize, float64(PlayAreaHeight)*0.65, 8)
 		ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	} else {
 		ui.Theme = DayTheme
 		ui.DrawFlower(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
-		ui.DrawChar(screen, GShape, centerX, float64(PlayAreaHeight)*0.65)
+		ui.DrawChar(screen, GShape, centerX, float64(PlayAreaHeight)*0.65, 4)
 	}
 }
 
