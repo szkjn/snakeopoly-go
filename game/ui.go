@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"golang.org/x/image/font"
@@ -54,6 +55,7 @@ func (ui *UI) DrawBaseElements(screen *ebiten.Image) {
 	screen.Fill(ui.Theme.Background)
 	ui.DrawGrid(screen)
 	ui.DrawPlayArea(screen)
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS  %0.0f\nTPS  %0.0f\n", ebiten.ActualFPS(), ebiten.ActualTPS()))
 }
 
 // Draw grid lines on screen
@@ -82,7 +84,7 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image, g *Game) {
 	ui.DrawText(screen, "center", "to Surveillance Sovereignty!", FontL, 7.5)
 
 	// Draw the welcome animation
-	ui.DrawWelcomeAnimation(screen, g)
+	ui.DrawWelcomeAnimation(screen, g, ui.Theme)
 
 	if g.BlinkText {
 		ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5)
@@ -149,7 +151,7 @@ func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8, level string, b
 	ui.DrawText(screen, "center", "But don't worry, your data", FontM, 10)
 	ui.DrawText(screen, "center", "will live on forever with us.", FontM, 11)
 	if blinkText {
-		ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, 18.5)
+		ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5)
 	}
 }
 
@@ -337,7 +339,7 @@ func (ui *UI) DrawChar(screen *ebiten.Image, char [][]int, x, y float64) {
 }
 
 // DrawWelcomeAnimation draws the GShape and SixShape alternately
-func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game) {
+func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game, initialUserTheme ColorTheme) {
 
 	// Calculate the center of the shape
 	shapeWidth := float64(len(GShape)) * ShapePixelSize
@@ -345,7 +347,7 @@ func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game) {
 
 	if !g.IsGShape {
 
-		ui.BlinkTheme(g)
+		ui.BlinkTheme(g, initialUserTheme)
 
 		// Draw the shape
 		ui.DrawChar(screen, SixShape, centerX, float64(ScreenHeight)/2)
@@ -353,13 +355,14 @@ func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game) {
 		ui.DrawChar(screen, SixShape, centerX+shapeWidth+ShapePixelSize, float64(ScreenHeight)/2)
 
 	} else {
+		ui.Theme = DayTheme
 		ui.DrawChar(screen, GShape, centerX, float64(ScreenHeight)/2)
 	}
 }
 
-func (ui *UI) BlinkTheme(g *Game) {
-	if time.Since(g.WelcomeThemeToggleTimer) >= SixShapeTime/20 {
-		if g.WelcomeThemeToggleCount < 6 {
+func (ui *UI) BlinkTheme(g *Game, initialUserTheme ColorTheme) {
+	if time.Since(g.WelcomeThemeToggleTimer) >= SixShapeTime/8 {
+		if g.WelcomeThemeToggleCount < 4 {
 			if ui.Theme == DayTheme {
 				ui.Theme = NightTheme
 			} else {

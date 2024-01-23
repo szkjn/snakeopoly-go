@@ -53,6 +53,6 @@ const (
 	BlinkFreq          time.Duration = 200 * time.Millisecond
 	TextAnimationSpeed time.Duration = 200 * time.Millisecond
 	ShapePixelSize     float64       = float64(ScreenUnit) / 6
-	GShapeTime         time.Duration = 1600 * time.Millisecond
-	SixShapeTime       time.Duration = 600 * time.Millisecond
+	GShapeTime         time.Duration = 2000 * time.Millisecond
+	SixShapeTime       time.Duration = 200 * time.Millisecond
 )

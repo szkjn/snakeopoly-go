@@ -34,6 +34,7 @@ type Game struct {
 	WelcomeAnimationTimer    time.Duration
 	IsGShape                 bool
 	WelcomeThemeToggleCount  int
+	BlinkCounter             int
 	WelcomeThemeToggleTimer  time.Time
 }
 
@@ -347,4 +348,3 @@ func (g *Game) handleSnakeMovementAndCollision(nextHeadX, nextHeadY float32) {
 		}
 	}
 }
-
