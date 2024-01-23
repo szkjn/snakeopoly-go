@@ -104,7 +104,7 @@ func GenerateRandomPosition(snake Snake) [2]float32 {
 // Create a new data point at a valid random position
 func NewDataPoint(snake Snake) DataPoint {
 	position := GenerateRandomPosition(snake)
-	return DataPoint{X: position[0], Y: position[1], Image: assets.DataPoint}
+	return DataPoint{X: position[0], Y: position[1], Image: assets.DataPointImg}
 }
 
 // Create a new special data point at a valid random position

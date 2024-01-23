@@ -146,7 +146,7 @@ func (g *Game) Update() error {
 		// Get the current time and calculate the time elapsed since the last movement
 		currentTime := time.Now()
 		elapsedTime := currentTime.Sub(g.LastMoveTime)
-		desiredInterval := time.Second / time.Duration(SnakeSpeed)
+		desiredInterval := time.Second/ time.Duration(SnakeSpeed)
 
 		// Check if it's time to move the snake
 		if elapsedTime >= desiredInterval {

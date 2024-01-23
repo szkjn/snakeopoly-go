@@ -1,12 +1,14 @@
 package assets
 
 import (
+	"bufio"
 	"embed"
 	"encoding/csv"
 	"fmt"
 	"image"
 	_ "image/png"
 	"io/fs"
+	"os"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -17,7 +19,8 @@ import (
 //go:embed *
 var assets embed.FS
 
-var DataPoint = MustLoadImage("images/30x30/user.png")
+var DataPointImg = MustLoadImage("images/30x30/user.png")
+var GooglevilImg = MustLoadImage("images/30x30/googlevil.png")
 
 func MustLoadImage(path string) *ebiten.Image {
 	f, err := assets.Open(path)
@@ -85,4 +88,24 @@ func LoadSpecialDataPointsCSV() ([][]string, error) {
 	}
 
 	return records, nil
+}
+
+func ReadAsciiArtFromFile(filePath string) ([]string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return lines, nil
 }

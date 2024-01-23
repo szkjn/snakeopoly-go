@@ -23,8 +23,7 @@ const (
 )
 
 func (s Snake) GetImage() *ebiten.Image {
-	s.Image = assets.MustLoadImage("images/30x30/googlevil.png")
-	return s.Image
+	return assets.GooglevilImg
 }
 
 // Check if the given direction is opposite to the current direction

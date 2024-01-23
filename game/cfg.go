@@ -26,7 +26,7 @@ const (
 const (
 	SnakeSize             float32 = ScreenUnit
 	InitialSnakeLength    float32 = 3
-	SnakeSpeed            float32 = 6
+	SnakeSpeed            float32 = 7
 	SpecialDataPointsRate int8    = 3
 )
 
@@ -45,6 +45,7 @@ var (
 	FontL   font.Face = assets.MustLoadFont(float64(ScreenUnit * 1.3))
 	FontM   font.Face = assets.MustLoadFont(float64(ScreenUnit * 1))
 	FontS   font.Face = assets.MustLoadFont(float64(ScreenUnit * 0.7))
+	FontXS  font.Face = assets.MustLoadFont(float64(ScreenUnit * 0.3))
 )
 
 // UI effects

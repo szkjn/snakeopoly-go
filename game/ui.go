@@ -11,6 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/szkjn/snakeopoly-go/assets"
 	"golang.org/x/image/font"
 )
 
@@ -85,6 +86,7 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image, g *Game) {
 
 	// Draw the welcome animation
 	ui.DrawWelcomeAnimation(screen, g, ui.Theme)
+	// ui.DrawEvil(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	if g.BlinkText {
@@ -122,14 +124,18 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, 
 	name := specialDP.Name
 	image := specialDP.Image
 	textStr := specialDP.Text
-	maxLineWidth := int(ScreenWidth) - 10*int(ScreenUnit)
+	maxLineWidth := int(ScreenWidth) - 11*int(ScreenUnit)
 
-	ui.DrawText(screen, "center", "Congrats! You've just acquired:", FontL, 4)
-	ui.DrawText(screen, "center", name, FontL, 5.5)
+	ui.DrawText(screen, "center", "Congrats! You've just acquired:", FontL, 3.5)
+	ui.DrawText(screen, "center", name, FontL, 5)
 
-	scale, x, y := ui.PlaceImage(image, 6.5, 3, "center")
+	scale, x, y := ui.PlaceImage(image, 6, 3, "center")
 	ui.DrawImage(screen, image, scale, x, y)
-	ui.DrawMultiLineText(screen, textStr, 7, 11, FontM, maxLineWidth, currentCharIndex)
+	ui.DrawMultiLineText(screen, textStr, 7.5, 10.5, FontM, maxLineWidth, currentCharIndex)
+
+	ui.DrawImage(screen, assets.GooglevilImg, 3.0, float64(ScreenUnit)*2.5, float64(PlayAreaHeight)*0.65)
+
+	// ui.DrawGEvil(screen, float64(ScreenUnit)*2.5, float64(PlayAreaHeight)*0.65)
 	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	totalLength := len(textStr)
@@ -170,10 +176,10 @@ func (ui *UI) DrawGoalPage(screen *ebiten.Image, score int8, blinkText bool) {
 	// levelDisplay := fmt.Sprintf("Level: XXX")
 
 	ui.DrawText(screen, "center", "CONGRATULATIONS !", FontXL, 4)
-	ui.DrawText(screen, "center", "Master of the Digital Panopticon !", FontL, 6)
-	ui.DrawText(screen, "center", "In the world of Surveillance Capitalism,", FontL, 7.5)
-	ui.DrawText(screen, "center", "you stand unrivaled !", FontL, 9)
-	ui.DrawText(screen, "center", "A true data supremacist !!!", FontL, 11)
+	ui.DrawText(screen, "center", "Master of the Digital Panopticon !", FontL, 7)
+	ui.DrawText(screen, "center", "In the world of Surveillance Capitalism,", FontL, 8.5)
+	ui.DrawText(screen, "center", "you stand unrivaled !", FontL, 10)
+	ui.DrawText(screen, "center", "A true data supremacist !!!", FontL, 13)
 	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	if blinkText {
@@ -205,6 +211,8 @@ func (ui *UI) DrawText(screen *ebiten.Image, alignment string, textStr string, f
 }
 
 func (ui *UI) DrawMultiLineText(screen *ebiten.Image, textStr string, xUnits, yUnits float32, fontFace font.Face, maxLineWidth int, currentCharIndex int) {
+	// Add double quotes at the beginning and end of the textStr
+	textStr = "\"" + textStr + "\""
 
 	// Split the text into words
 	words := strings.Fields(textStr)
@@ -352,6 +360,21 @@ func (ui *UI) DrawFire(screen *ebiten.Image, y float64) {
 	ui.DrawChar(screen, FireShape, float64(ScreenWidth)/2, y)
 }
 
+func (ui *UI) DrawEvil(screen *ebiten.Image, y float64) {
+	ui.DrawChar(screen, EvilShape, float64(ScreenUnit), y)
+}
+
+func (ui *UI) DrawGEvil(screen *ebiten.Image, x, y float64) {
+	ui.DrawChar(screen, GEvilShape, x, y)
+}
+
+func (ui *UI) DrawAsciiArt(screen *ebiten.Image, asciiArt []string, x, y int) {
+	// fmt.Println(asciiArt)
+	for i, line := range asciiArt {
+		text.Draw(screen, line, FontXS, x, y+i*int(FontXS.Metrics().Height.Ceil()), ui.Theme.DrawElement)
+	}
+}
+
 // DrawWelcomeAnimation draws the GShape and SixShape alternately
 func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game, initialUserTheme ColorTheme) {
 
@@ -364,13 +387,13 @@ func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game, initialUserThe
 		ui.BlinkTheme(g, initialUserTheme)
 
 		// Draw the shape
-		ui.DrawChar(screen, SixShape, centerX, float64(ScreenHeight)/2)
-		ui.DrawChar(screen, SixShape, centerX-shapeWidth-ShapePixelSize, float64(ScreenHeight)/2)
-		ui.DrawChar(screen, SixShape, centerX+shapeWidth+ShapePixelSize, float64(ScreenHeight)/2)
+		ui.DrawChar(screen, SixShape, centerX, float64(PlayAreaHeight)*0.65)
+		ui.DrawChar(screen, SixShape, centerX-shapeWidth-ShapePixelSize, float64(PlayAreaHeight)*0.65)
+		ui.DrawChar(screen, SixShape, centerX+shapeWidth+ShapePixelSize, float64(PlayAreaHeight)*0.65)
 
 	} else {
 		ui.Theme = DayTheme
-		ui.DrawChar(screen, GShape, centerX, float64(ScreenHeight)/2)
+		ui.DrawChar(screen, GShape, centerX, float64(PlayAreaHeight)*0.65)
 	}
 }
 
