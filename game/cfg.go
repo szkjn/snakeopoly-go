@@ -26,14 +26,14 @@ const (
 const (
 	SnakeSize             float32 = ScreenUnit
 	InitialSnakeLength    float32 = 3
-	SnakeSpeed            float32 = 7
-	SpecialDataPointsRate int8    = 2
+	SnakeSpeed            float32 = 6
+	SpecialDataPointsRate int8    = 3
 )
 
 // Colors
 var (
 	LighterGreen color.Color = color.RGBA{160, 210, 160, 255}
-	LightGreen   color.Color = color.RGBA{150, 190, 150, 255}
+	LightGreen   color.Color = color.RGBA{160, 200, 160, 255}
 	DarkerGreen  color.Color = color.RGBA{20, 40, 20, 255}
 	DarkGreen    color.Color = color.RGBA{20, 70, 20, 255}
 )
@@ -51,8 +51,8 @@ var (
 const (
 	TotalBlinkDuration time.Duration = 1 * time.Second
 	BlinkFreq          time.Duration = 200 * time.Millisecond
-	TextAnimationSpeed time.Duration = 200 * time.Millisecond
+	TextAnimationSpeed time.Duration = 300 * time.Millisecond
 	ShapePixelSize     float64       = float64(ScreenUnit) / 6
 	GShapeTime         time.Duration = 2000 * time.Millisecond
-	SixShapeTime       time.Duration = 200 * time.Millisecond
+	SixShapeTime       time.Duration = 400 * time.Millisecond
 )

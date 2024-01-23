@@ -85,6 +85,7 @@ func (ui *UI) DrawWelcomePage(screen *ebiten.Image, g *Game) {
 
 	// Draw the welcome animation
 	ui.DrawWelcomeAnimation(screen, g, ui.Theme)
+	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	if g.BlinkText {
 		ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5)
@@ -129,6 +130,7 @@ func (ui *UI) DrawSpecialPage(screen *ebiten.Image, specialDP SpecialDataPoint, 
 	scale, x, y := ui.PlaceImage(image, 6.5, 3, "center")
 	ui.DrawImage(screen, image, scale, x, y)
 	ui.DrawMultiLineText(screen, textStr, 7, 11, FontM, maxLineWidth, currentCharIndex)
+	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
 
 	totalLength := len(textStr)
 
@@ -149,9 +151,12 @@ func (ui *UI) DrawGameOverPage(screen *ebiten.Image, score int8, level string, b
 	ui.DrawText(screen, "center", "GAME OVER", FontXL, 4)
 	ui.DrawText(screen, "center", scoreDisplay, FontM, 6)
 	ui.DrawText(screen, "center", levelDisplay, FontM, 7)
-	ui.DrawText(screen, "center", "Oops! You've been out-monopolized.", FontM, 9)
-	ui.DrawText(screen, "center", "But don't worry, your data", FontM, 10)
-	ui.DrawText(screen, "center", "will live on forever with us.", FontM, 11)
+	ui.DrawText(screen, "center", "Oops! You've been out-monopolized.", FontM, 10)
+	ui.DrawText(screen, "center", "But don't worry, your data", FontM, 11)
+	ui.DrawText(screen, "center", "will live on forever with us.", FontM, 12)
+
+	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
+
 	if blinkText {
 		ui.DrawText(screen, "center", "Press P to play or Q to quit", FontM, 18.5)
 	}
@@ -169,6 +174,8 @@ func (ui *UI) DrawGoalPage(screen *ebiten.Image, score int8, blinkText bool) {
 	ui.DrawText(screen, "center", "In the world of Surveillance Capitalism,", FontL, 7.5)
 	ui.DrawText(screen, "center", "you stand unrivaled !", FontL, 9)
 	ui.DrawText(screen, "center", "A true data supremacist !!!", FontL, 11)
+	ui.DrawFire(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
+
 	if blinkText {
 		ui.DrawText(screen, "center", "Press P to replay or Q to quit", FontM, 18.5)
 	}
@@ -338,6 +345,11 @@ func (ui *UI) DrawChar(screen *ebiten.Image, char [][]int, x, y float64) {
 			}
 		}
 	}
+}
+
+func (ui *UI) DrawFire(screen *ebiten.Image, y float64) {
+	ui.DrawChar(screen, FireShape, float64(ScreenUnit), y)
+	ui.DrawChar(screen, FireShape, float64(ScreenWidth)/2, y)
 }
 
 // DrawWelcomeAnimation draws the GShape and SixShape alternately
