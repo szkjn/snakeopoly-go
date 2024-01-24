@@ -363,8 +363,13 @@ func (ui *UI) DrawChar(screen *ebiten.Image, char [][]int, x, y, pixelSize float
 }
 
 func (ui *UI) DrawFlower(screen *ebiten.Image, y float64) {
-	ui.DrawChar(screen, FlowerShape, float64(ScreenUnit), y, 4)
-	ui.DrawChar(screen, FlowerShape, float64(ScreenWidth)/2, y, 4)
+	ui.DrawChar(screen, FlowerShape, float64(ScreenUnit), y, 8)
+	ui.DrawChar(screen, FlowerShape, float64(ScreenWidth)/2, y, 8)
+}
+
+func (ui *UI) DrawCity(screen *ebiten.Image, y float64) {
+	ui.DrawChar(screen, CityShape, float64(ScreenUnit), y, 8)
+	ui.DrawChar(screen, CityShape, float64(ScreenWidth)/2, y, 8)
 }
 
 func (ui *UI) DrawFire(screen *ebiten.Image, y float64) {
@@ -381,7 +386,6 @@ func (ui *UI) DrawGEvil(screen *ebiten.Image, x, y float64) {
 }
 
 func (ui *UI) DrawAsciiArt(screen *ebiten.Image, asciiArt []string, x, y int) {
-	// fmt.Println(asciiArt)
 	for i, line := range asciiArt {
 		text.Draw(screen, line, FontXS, x, y+i*int(FontXS.Metrics().Height.Ceil()), ui.Theme.DrawElement)
 	}
@@ -404,7 +408,7 @@ func (ui *UI) DrawWelcomeAnimation(screen *ebiten.Image, g *Game, initialUserThe
 
 	} else {
 		ui.Theme = DayTheme
-		ui.DrawFlower(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*0.7)
-		ui.DrawChar(screen, GShape, centerX, float64(PlayAreaHeight)*0.65, 4)
+		ui.DrawCity(screen, float64(PlayAreaHeight)-float64(ScreenUnit)*1.6)
+		ui.DrawChar(screen, GShape, centerX, float64(PlayAreaHeight)*0.65, 8)
 	}
 }
