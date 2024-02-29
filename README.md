@@ -32,4 +32,6 @@ The Snakeopoly codebase is structured as follows:
 
 ## Getting Started
 
-To get started with Snakeopoly, clone this repository and ensure you have Golang 1.21.5 installed on your Windows machine. Open the project with Visual Studio Code and run main.go to launch the game. Explore the game/ directory to understand the game's core logic and components.
+To get started with Snakeopoly, clone this repository and ensure you have Golang 1.21.5.
+
+Explore the game/ directory to understand the game's core logic and components.
